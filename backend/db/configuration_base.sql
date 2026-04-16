@@ -15,7 +15,7 @@ create table deliveries (
   pickup_address text,
   delivery_address text,
   price integer,
-  status text check (status in ('pending','accepted','picked','delivered')),
+  status text default'pending' check (status in ('pending','accepted','picked','delivered')),
   created_at timestamp default now()
 );
 
@@ -24,7 +24,7 @@ create table payments (
   id uuid primary key default gen_random_uuid(),
   delivery_id uuid references deliveries(id),
   amount integer,
-  status text,
+  status text default 'pending',
   created_at timestamp default now()
 );
 
@@ -42,6 +42,6 @@ create table disputes (
   id uuid primary key default gen_random_uuid(),
   delivery_id uuid references deliveries(id),
   reason text,
-  status text,
+  status text default 'open',
   created_at timestamp default now()
 );
