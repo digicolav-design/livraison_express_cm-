@@ -45,3 +45,11 @@ create table disputes (
   status text default 'open',
   created_at timestamp default now()
 );
+insert into deliveries (client_id, pickup_address, delivery_address, price, status)
+values (
+  (select id from users where phone = '670000001'),
+  'Bastos',
+  'Mvan',
+  1760,
+  'pending'
+);
