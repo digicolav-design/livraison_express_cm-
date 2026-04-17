@@ -1,7 +1,22 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
+import { supabase } from "../lib/supabase";
 
 export default function Index() {
+
+  // 🔥 TEST SUPABASE
+  useEffect(() => {
+    const test = async () => {
+      const { data, error } = await supabase.from('users').select('*');
+
+      console.log('DATA:', data);
+      console.log('ERROR:', error);
+    };
+
+    test();
+  }, []);
+
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
