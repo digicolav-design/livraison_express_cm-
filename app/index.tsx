@@ -1,21 +1,11 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { StatusBar } from "expo-status-bar";
+import { Link } from 'expo-router';
 import { useEffect } from "react";
-import { supabase } from "../lib/supabase";
 
 export default function Index() {
 
   // 🔥 TEST SUPABASE
-  useEffect(() => {
-    const test = async () => {
-      const { data, error } = await supabase.from('users').select('*');
-
-      console.log('DATA:', data);
-      console.log('ERROR:', error);
-    };
-
-    test();
-  }, []);
 
   return (
     <View style={styles.container}>
@@ -35,11 +25,13 @@ export default function Index() {
       {/* BOUTONS */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.btnPrimary}>
-          <Text style={styles.btnPrimaryText}>Commencer →</Text>
+          <Link href="/inscription">
+            <Text style={styles.btnPrimaryText}>Commencer →</Text>
+          </Link>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.btnOutline}>
-          <Text style={styles.btnOutlineText}>J'ai déjà un compte</Text>
+          <Text style={styles.btnOutlineText}> <Link href="/connexion"><Text style={styles.link}> J'ai déjà un compte </Text> </Link></Text>
         </TouchableOpacity>
       </View>
 
