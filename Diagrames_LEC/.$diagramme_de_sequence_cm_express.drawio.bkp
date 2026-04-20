@@ -1,10 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.6.6 Chrome/144.0.7559.236 Electron/40.8.4 Safari/537.36" version="29.6.6">
   <diagram id="dpas-MCVYfEEb5-67ay5" name="Page-1">
-<<<<<<< HEAD
     <mxGraphModel dx="2617" dy="561" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="2339" background="light-dark(#FFFFFF,#FFE3D0)" math="0" shadow="1">
-=======
-    <mxGraphModel dx="976" dy="491" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="2339" math="0" shadow="0">
->>>>>>> 155a936897539c7645ac6f52618890d14a3f55fe
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -114,41 +110,25 @@
         <mxCell id="sep1lbl" parent="1" style="text;strokeColor=none;fillColor=none;html=1;fontSize=10;fontStyle=2;labelBackgroundColor=none;fontColor=#1A1A1A;" value="[Déjà inscrit]" vertex="1">
           <mxGeometry height="16" width="100" x="96" y="312" as="geometry" />
         </mxCell>
-<<<<<<< HEAD
         <mxCell id="m4" edge="1" parent="1" style="endArrow=open;endFill=1;startArrow=none;edgeStyle=orthogonalEdgeStyle;labelBackgroundColor=none;strokeColor=#182E3E;fontColor=default;" value="seConnecter(email, mdp)">
-=======
-        <mxCell id="m4" edge="1" parent="1" style="endArrow=open;endFill=1;startArrow=none;edgeStyle=orthogonalEdgeStyle;" value="seConnecter(tel,email, mdp)">
->>>>>>> 155a936897539c7645ac6f52618890d14a3f55fe
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="110" y="340" as="sourcePoint" />
             <mxPoint x="330" y="340" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-<<<<<<< HEAD
         <mxCell id="m5" edge="1" parent="1" style="endArrow=open;endFill=1;startArrow=none;edgeStyle=orthogonalEdgeStyle;labelBackgroundColor=none;strokeColor=#182E3E;fontColor=default;" value="authentifier(email, mdp)">
-=======
-        <mxCell id="m5" edge="1" parent="1" style="endArrow=open;endFill=1;startArrow=none;edgeStyle=orthogonalEdgeStyle;" value="authentifier(tel,email, mdp)">
->>>>>>> 155a936897539c7645ac6f52618890d14a3f55fe
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="330" y="358" as="sourcePoint" />
             <mxPoint x="775" y="358" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-<<<<<<< HEAD
         <mxCell id="m6" edge="1" parent="1" style="endArrow=open;endFill=1;startArrow=none;edgeStyle=orthogonalEdgeStyle;labelBackgroundColor=none;strokeColor=#182E3E;fontColor=default;" value="genererToken()">
-=======
-        <mxCell id="m6" edge="1" parent="1" style="endArrow=open;endFill=1;startArrow=none;edgeStyle=orthogonalEdgeStyle;" value="generer digit()">
->>>>>>> 155a936897539c7645ac6f52618890d14a3f55fe
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="775" y="370" as="sourcePoint" />
             <mxPoint x="775" y="370" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-<<<<<<< HEAD
         <mxCell id="m7" edge="1" parent="1" style="endArrow=open;endFill=1;startArrow=none;dashed=1;edgeStyle=orthogonalEdgeStyle;labelBackgroundColor=none;strokeColor=#182E3E;fontColor=default;" value="token JWT">
-=======
-        <mxCell id="m7" edge="1" parent="1" style="endArrow=open;endFill=1;startArrow=none;dashed=1;edgeStyle=orthogonalEdgeStyle;" value="digit JWT">
->>>>>>> 155a936897539c7645ac6f52618890d14a3f55fe
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="775" y="385" as="sourcePoint" />
             <mxPoint x="110" y="385" as="targetPoint" />
@@ -244,7 +224,6 @@
             <mxPoint x="550" y="760" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-<<<<<<< HEAD
         <mxCell id="m21" edge="1" parent="1" style="endArrow=open;endFill=1;startArrow=none;edgeStyle=orthogonalEdgeStyle;labelBackgroundColor=none;strokeColor=#182E3E;fontColor=default;" value="statut=ACCEPTEE">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="550" y="778" as="sourcePoint" />
@@ -252,9 +231,6 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="m22" edge="1" parent="1" style="endArrow=open;endFill=1;startArrow=none;dashed=1;edgeStyle=orthogonalEdgeStyle;labelBackgroundColor=none;strokeColor=#182E3E;fontColor=default;" value="confirmation acceptation">
-=======
-        <mxCell id="m22" edge="1" parent="1" style="endArrow=open;endFill=1;startArrow=none;dashed=1;edgeStyle=orthogonalEdgeStyle;" value="confirmation acceptation">
->>>>>>> 155a936897539c7645ac6f52618890d14a3f55fe
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="550" y="796" as="sourcePoint" />
             <mxPoint x="110" y="796" as="targetPoint" />
@@ -266,16 +242,12 @@
             <mxPoint x="1360" y="830" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-<<<<<<< HEAD
         <mxCell id="WOBvZe4aFTtt-WXI7gsX-6" connectable="0" parent="sep5" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;fontColor=#1A1A1A;" value="Text" vertex="1">
           <mxGeometry relative="1" x="0.1266" y="-10" as="geometry">
             <mxPoint x="-1" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="sep5lbl" parent="1" style="text;strokeColor=none;fillColor=none;html=1;fontSize=10;fontStyle=2;labelBackgroundColor=none;fontColor=#1A1A1A;" value="[Refuse]" vertex="1">
-=======
-        <mxCell id="sep5lbl" parent="1" style="text;strokeColor=none;fillColor=none;html=1;fontSize=10;fontStyle=2;" value="[Refuse]" vertex="1">
->>>>>>> 155a936897539c7645ac6f52618890d14a3f55fe
           <mxGeometry height="16" width="80" x="406" y="832" as="geometry" />
         </mxCell>
         <mxCell id="m23" edge="1" parent="1" style="endArrow=open;endFill=1;startArrow=none;edgeStyle=orthogonalEdgeStyle;labelBackgroundColor=none;strokeColor=#182E3E;fontColor=default;" value="refuserCourse(commandeId)">
@@ -377,11 +349,27 @@
             <mxPoint x="1490" y="1270" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-<<<<<<< HEAD
+        <mxCell id="WOBvZe4aFTtt-WXI7gsX-8" connectable="0" parent="m34" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;fontColor=#1A1A1A;" value="Text" vertex="1">
+          <mxGeometry relative="1" x="-0.2532" y="10" as="geometry">
+            <mxPoint x="-1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WOBvZe4aFTtt-WXI7gsX-9" connectable="0" parent="m34" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;fontColor=#1A1A1A;" value="Text" vertex="1">
+          <mxGeometry relative="1" x="-0.2036" y="10" as="geometry">
+            <mxPoint x="-1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WOBvZe4aFTtt-WXI7gsX-10" connectable="0" parent="m34" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;fontColor=#1A1A1A;" value="Text" vertex="1">
+          <mxGeometry relative="1" x="-0.0549" y="11" as="geometry">
+            <mxPoint x="-1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WOBvZe4aFTtt-WXI7gsX-11" connectable="0" parent="m34" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;fontColor=#1A1A1A;" value="Text" vertex="1">
+          <mxGeometry relative="1" x="-0.2898" y="11" as="geometry">
+            <mxPoint x="-1" as="offset" />
+          </mxGeometry>
+        </mxCell>
         <mxCell id="m35" edge="1" parent="1" style="endArrow=open;endFill=1;startArrow=none;dashed=1;edgeStyle=orthogonalEdgeStyle;labelBackgroundColor=none;strokeColor=#182E3E;fontColor=default;" value="paiement confirmé (ref Orange)">
-=======
-        <mxCell id="m35" edge="1" parent="1" style="endArrow=open;endFill=1;startArrow=none;dashed=1;edgeStyle=orthogonalEdgeStyle;" value="paiement confirmé (ref Orange)">
->>>>>>> 155a936897539c7645ac6f52618890d14a3f55fe
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="1490" y="1288" as="sourcePoint" />
             <mxPoint x="110" y="1288" as="targetPoint" />

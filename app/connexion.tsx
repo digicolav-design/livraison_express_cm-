@@ -36,7 +36,7 @@ export default function LoginScreen() {
       <Text style={styles.logo}>Livraison Express CM</Text>
       <Text style={styles.welcome}>Connexion</Text>
 
-      <Text style={styles.label}>Email</Text>
+      <Text style={styles.label}>Telephone</Text>
       <TextInput
         style={styles.input}
         value={email}
