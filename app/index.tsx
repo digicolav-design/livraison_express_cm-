@@ -3,6 +3,7 @@ import { StatusBar } from "expo-status-bar";
 import { Link } from 'expo-router';
 import { useEffect } from "react";
 
+
 export default function Index() {
 
   // 🔥 TEST SUPABASE
@@ -31,7 +32,7 @@ export default function Index() {
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.btnOutline}>
-          <Text style={styles.btnOutlineText}> <Link href="/connexion"><Text style={styles.link}> J'ai déjà un compte </Text> </Link></Text>
+          <Text style={styles.btnOutlineText}> <Link href="/connexion"><Text style={styles.link}> {"j'ai déjà un compte"}</Text> </Link></Text>
         </TouchableOpacity>
       </View>
 
@@ -109,4 +110,10 @@ const styles = StyleSheet.create({
     color: "rgba(255,255,255,0.6)",
     fontSize: 13,
   },
+  link: {
+    color: "#FFFFFF", // ou la couleur de votre choix
+    fontWeight: "600",
+  },
+
 });
+

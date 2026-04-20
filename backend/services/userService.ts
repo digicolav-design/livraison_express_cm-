@@ -1,7 +1,7 @@
 import { supabase } from '../../lib/supabase'
 
 // CREER UN UTILISATEUR
-export const createUser = async (phone, full_name, role) => {
+export const createUser = async (phone:any, full_name:any, role:any) => {
   const { data, error } = await supabase
     .from("users")
     .upsert(

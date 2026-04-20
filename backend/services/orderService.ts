@@ -1,7 +1,7 @@
 import { supabase } from "../../lib/supabase";
 
 // 📦 créer une commande
-export const createOrder = async (order) => {
+export const createOrder = async (order:any) => {
   const { data, error } = await supabase
     .from("orders")
     .insert([order])
@@ -11,7 +11,7 @@ export const createOrder = async (order) => {
 };
 
 // 📦 récupérer les commandes d’un user
-export const getOrdersByUser = async (user_id) => {
+export const getOrdersByUser = async (user_id : any) => {
   const { data, error } = await supabase
     .from("orders")
     .select("*")

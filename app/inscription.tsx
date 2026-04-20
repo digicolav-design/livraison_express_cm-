@@ -12,35 +12,40 @@ export default function SignUpScreen() {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
 
- const handleSubmit = async () => {
+const handleSubmit = async () => {
   if (!name || !email || !phone || !password) {
     Alert.alert("Erreur", "Tous les champs sont obligatoires !");
     return;
   }
 
-  if (password.length < 8) {
-    Alert.alert("Erreur", "Mot de passe trop court");
-    return;
+  try {
+    console.log("Début de l'inscription...");
+
+    // 🔐 1. créer compte auth
+    const { data: authData, error: authError } = await signUp(email, password);
+
+    if (authError) {
+      Alert.alert("Erreur d'authentification", authError.message);
+      return;
+    }
+
+    console.log("Auth réussie, création du profil...");
+
+    // 👤 2. créer profil user (dans votre table publique)
+    const { data, error } = await createUser(phone, name, "client");
+
+    if (error) {
+      Alert.alert("Erreur Profil", error.message);
+      return;
+    }
+
+    Alert.alert("Succès", "Compte créé !");
+    router.push("/connexion");
+    
+  } catch (err) {
+    console.error(err);
+    Alert.alert("Erreur Inattendue", "Impossible de contacter le serveur.");
   }
-
-  // 🔐 1. créer compte auth
-  const { data: authData, error: authError } = await signUp(email, password);
-
-  if (authError) {
-    Alert.alert("Erreur", authError.message);
-    return;
-  }
-
-  // 👤 2. créer profil user
-  const { data, error } = await createUser(phone, name, "client");
-
-  if (error) {
-    Alert.alert("Erreur", error.message);
-    return;
-  }
-
-  Alert.alert("Succès", "Compte créé !");
-  router.push("/connexion");
 };
 
   return (

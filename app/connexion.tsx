@@ -16,7 +16,7 @@ export default function LoginScreen() {
     }
 
     try {
-      const { data, error } = await loginUser(email, password);
+      const { data, error } = await signIn(email, password);
 
       if (error) {
         Alert.alert("Erreur", error.message);
@@ -56,7 +56,7 @@ export default function LoginScreen() {
       </TouchableOpacity>
 
       <Text style={styles.footer}>
-        Pas de compte ? <Link href="/inscription">S'inscrire</Link>
+        Pas de compte ? <Link href="/inscription">S{"'"}inscrire</Link>
       </Text>
     </View>
   );
