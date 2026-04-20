@@ -13,38 +13,27 @@ export default function SignUpScreen() {
   const [password, setPassword] = useState('');
 
 const handleSubmit = async () => {
-  if (!name || !email || !phone || !password) {
-    Alert.alert("Erreur", "Tous les champs sont obligatoires !");
+  // 1. On crée d'abord le compte d'authentification
+  const { data: authData, error: authError } = await signUp(email, password);
+
+  if (authError) {
+    Alert.alert("Erreur d'authentification", authError.message);
     return;
   }
 
-  try {
-    console.log("Début de l'inscription...");
+  // 2. Si l'auth réussit, on récupère l'ID généré par Supabase
+  if (authData?.user) {
+    const userId = authData.user.id;
 
-    // 🔐 1. créer compte auth
-    const { data: authData, error: authError } = await signUp(email, password);
+    // 3. On envoie TOUTES les infos dans votre table 'users'
+    const { error: dbError } = await createUser(userId, name, phone, "client");
 
-    if (authError) {
-      Alert.alert("Erreur d'authentification", authError.message);
-      return;
+    if (dbError) {
+      Alert.alert("Erreur Base de données", dbError.message);
+    } else {
+      Alert.alert("Succès", "Votre compte a été créé avec succès !");
+      router.push("/connexion");
     }
-
-    console.log("Auth réussie, création du profil...");
-
-    // 👤 2. créer profil user (dans votre table publique)
-    const { data, error } = await createUser(phone, name, "client");
-
-    if (error) {
-      Alert.alert("Erreur Profil", error.message);
-      return;
-    }
-
-    Alert.alert("Succès", "Compte créé !");
-    router.push("/connexion");
-    
-  } catch (err) {
-    console.error(err);
-    Alert.alert("Erreur Inattendue", "Impossible de contacter le serveur.");
   }
 };
 
