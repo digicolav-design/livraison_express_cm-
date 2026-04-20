@@ -349,6 +349,26 @@
             <mxPoint x="1490" y="1270" as="targetPoint" />
           </mxGeometry>
         </mxCell>
+        <mxCell id="WOBvZe4aFTtt-WXI7gsX-8" connectable="0" parent="m34" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;fontColor=#1A1A1A;" value="Text" vertex="1">
+          <mxGeometry relative="1" x="-0.2532" y="10" as="geometry">
+            <mxPoint x="-1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WOBvZe4aFTtt-WXI7gsX-9" connectable="0" parent="m34" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;fontColor=#1A1A1A;" value="Text" vertex="1">
+          <mxGeometry relative="1" x="-0.2036" y="10" as="geometry">
+            <mxPoint x="-1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WOBvZe4aFTtt-WXI7gsX-10" connectable="0" parent="m34" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;fontColor=#1A1A1A;" value="Text" vertex="1">
+          <mxGeometry relative="1" x="-0.0549" y="11" as="geometry">
+            <mxPoint x="-1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WOBvZe4aFTtt-WXI7gsX-11" connectable="0" parent="m34" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;fontColor=#1A1A1A;" value="Text" vertex="1">
+          <mxGeometry relative="1" x="-0.2898" y="11" as="geometry">
+            <mxPoint x="-1" as="offset" />
+          </mxGeometry>
+        </mxCell>
         <mxCell id="m35" edge="1" parent="1" style="endArrow=open;endFill=1;startArrow=none;dashed=1;edgeStyle=orthogonalEdgeStyle;labelBackgroundColor=none;strokeColor=#182E3E;fontColor=default;" value="paiement confirmé (ref Orange)">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="1490" y="1288" as="sourcePoint" />
