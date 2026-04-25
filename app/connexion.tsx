@@ -1,33 +1,60 @@
-import React, { useState } from 'react';
+import { router } from "expo-router";
+import React, { useState } from "react";
 import {
-  View, Text, TouchableOpacity, ScrollView,
-  StyleSheet, StatusBar, SafeAreaView,
-  TextInput, KeyboardAvoidingView, Platform,
-} from 'react-native';
-import { router } from 'expo-router';
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { supabase } from "../lib/supabase";
 
 export default function ConnexionScreen() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [emailFocused, setEmailFocused] = useState(false);
   // Indique si l'utilisateur a tenté de soumettre
   const [soumis, setSoumis] = useState(false);
 
-  const emailValide = email.includes('@') && email.includes('.');
+  const emailValide = email.includes("@") && email.includes(".");
 
-  const handleSoumettre = () => {
+  const handleSoumettre = async () => {
     setSoumis(true);
-    if (emailValide) {
-      router.push('/');
-    }
-  };
 
+    if (!emailValide) return;
+
+    try {
+      // 🔐 Connexion avec Supabase
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: "12345678", // ⚠️ même mot de passe que lors de l'inscription
+      });
+
+      if (error) {
+        console.log("Erreur connexion:", error.message);
+        return;
+      }
+
+      console.log("Utilisateur connecté:", data.user?.id);
+
+      // ✅ Redirection vers l'accueil
+      router.push("/");
+    } catch (err) {
+      console.log("Erreur générale:", err);
+    }
+    console.log("Tentative connexion avec:", email);
+  };
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <ScrollView
           contentContainerStyle={styles.scrollContent}
@@ -35,7 +62,10 @@ export default function ConnexionScreen() {
           keyboardShouldPersistTaps="handled"
         >
           {/* BOUTON RETOUR */}
-          <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+          <TouchableOpacity
+            style={styles.backBtn}
+            onPress={() => router.back()}
+          >
             <Text style={styles.backBtnText}>◀ Retour</Text>
           </TouchableOpacity>
 
@@ -48,7 +78,10 @@ export default function ConnexionScreen() {
           {/* NOTE CHAMP OBLIGATOIRE */}
           <View style={styles.obligatoireNote}>
             <Text style={styles.obligatoireEtoile}>*</Text>
-            <Text style={styles.obligatoireTexte}> Ce champ est obligatoire</Text>
+            <Text style={styles.obligatoireTexte}>
+              {" "}
+              Ce champ est obligatoire
+            </Text>
           </View>
 
           {/* LABEL AVEC ÉTOILE ROUGE */}
@@ -59,12 +92,14 @@ export default function ConnexionScreen() {
           </View>
 
           {/* CHAMP EMAIL */}
-          <View style={[
-            styles.inputContainer,
-            emailFocused && styles.inputContainerFocused,
-            // Bordure rouge si soumis et email invalide
-            soumis && !emailValide && styles.inputContainerError,
-          ]}>
+          <View
+            style={[
+              styles.inputContainer,
+              emailFocused && styles.inputContainerFocused,
+              // Bordure rouge si soumis et email invalide
+              soumis && !emailValide && styles.inputContainerError,
+            ]}
+          >
             <View style={styles.inputIconBox}>
               <Text style={styles.inputIcon}>✉️</Text>
             </View>
@@ -112,9 +147,9 @@ export default function ConnexionScreen() {
 
           {/* CONDITIONS */}
           <Text style={styles.termsText}>
-            En continuant, tu acceptes nos{' '}
-            <Text style={styles.termsLink}>Conditions d'utilisation</Text>
-            {' '}et notre{' '}
+            En continuant, tu acceptes nos{" "}
+            <Text style={styles.termsLink}>Conditions d'utilisation</Text> et
+            notre{" "}
             <Text style={styles.termsLink}>Politique de confidentialité</Text>
           </Text>
 
@@ -124,7 +159,6 @@ export default function ConnexionScreen() {
               🔒 Tes données sont protégées et sécurisées
             </Text>
           </View>
-
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -132,131 +166,178 @@ export default function ConnexionScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1, backgroundColor: "#fff" },
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 24,
     paddingTop: 16,
     paddingBottom: 40,
   },
-  backBtn: { alignSelf: 'flex-start', marginBottom: 32 },
-  backBtnText: { fontSize: 14, color: '#0A2FCC', fontWeight: '600' },
-  title: { fontSize: 30, fontWeight: '800', color: '#111827', marginBottom: 10 },
-  subtitle: { fontSize: 15, color: '#6B7280', lineHeight: 22, marginBottom: 20 },
+  backBtn: { alignSelf: "flex-start", marginBottom: 32 },
+  backBtnText: { fontSize: 14, color: "#0A2FCC", fontWeight: "600" },
+  title: {
+    fontSize: 30,
+    fontWeight: "800",
+    color: "#111827",
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 15,
+    color: "#6B7280",
+    lineHeight: 22,
+    marginBottom: 20,
+  },
 
   // Note champ obligatoire
   obligatoireNote: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FEF2F2',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FEF2F2",
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 7,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#FECACA',
+    borderColor: "#FECACA",
   },
-  obligatoireEtoile: { fontSize: 14, fontWeight: '800', color: '#FF4D4D' },
-  obligatoireTexte: { fontSize: 11, color: '#FF4D4D', fontWeight: '500' },
+  obligatoireEtoile: { fontSize: 14, fontWeight: "800", color: "#FF4D4D" },
+  obligatoireTexte: { fontSize: 11, color: "#FF4D4D", fontWeight: "500" },
 
   // Label avec étoile rouge
   labelRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 8,
   },
   labelText: {
     fontSize: 10,
-    fontWeight: '700',
-    color: '#6B7280',
-    textTransform: 'uppercase',
+    fontWeight: "700",
+    color: "#6B7280",
+    textTransform: "uppercase",
     letterSpacing: 1,
   },
   // L'étoile rouge *
   labelEtoile: {
     fontSize: 14,
-    fontWeight: '800',
-    color: '#FF4D4D',
+    fontWeight: "800",
+    color: "#FF4D4D",
     lineHeight: 16,
   },
 
   // Champ email
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 2,
-    borderColor: '#E5E4DF',
+    borderColor: "#E5E4DF",
     borderRadius: 16,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
     marginBottom: 6,
-    overflow: 'hidden',
-    shadowColor: '#000',
+    overflow: "hidden",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 6,
     elevation: 1,
   },
   inputContainerFocused: {
-    borderColor: '#0A2FCC',
-    backgroundColor: '#fff',
-    shadowColor: '#0A2FCC',
+    borderColor: "#0A2FCC",
+    backgroundColor: "#fff",
+    shadowColor: "#0A2FCC",
     shadowOpacity: 0.12,
     elevation: 3,
   },
   // Bordure rouge si erreur
   inputContainerError: {
-    borderColor: '#FF4D4D',
-    backgroundColor: '#FEF2F2',
+    borderColor: "#FF4D4D",
+    backgroundColor: "#FEF2F2",
   },
   inputIconBox: {
-    paddingHorizontal: 14, paddingVertical: 16,
-    backgroundColor: '#EEF2FF',
-    alignItems: 'center', justifyContent: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 16,
+    backgroundColor: "#EEF2FF",
+    alignItems: "center",
+    justifyContent: "center",
   },
   inputIcon: { fontSize: 20 },
-  inputDivider: { width: 1, height: '100%', backgroundColor: '#C7D2FE' },
+  inputDivider: { width: 1, height: "100%", backgroundColor: "#C7D2FE" },
   input: {
-    flex: 1, paddingHorizontal: 14, paddingVertical: 16,
-    fontSize: 16, color: '#111827', fontWeight: '500',
+    flex: 1,
+    paddingHorizontal: 14,
+    paddingVertical: 16,
+    fontSize: 16,
+    color: "#111827",
+    fontWeight: "500",
   },
   validIcon: {
-    fontSize: 18, color: '#00C48C',
-    fontWeight: '700', paddingRight: 14,
+    fontSize: 18,
+    color: "#00C48C",
+    fontWeight: "700",
+    paddingRight: 14,
   },
 
   // Message d'erreur
   erreurMsg: {
     fontSize: 11,
-    color: '#FF4D4D',
-    fontWeight: '500',
+    color: "#FF4D4D",
+    fontWeight: "500",
     marginBottom: 10,
     marginLeft: 4,
   },
 
   infoBox: {
-    backgroundColor: '#EEF2FF', borderRadius: 12,
-    paddingHorizontal: 16, paddingVertical: 13, marginBottom: 28,
+    backgroundColor: "#EEF2FF",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 13,
+    marginBottom: 28,
   },
-  infoText: { fontSize: 14, color: '#0A2FCC', fontWeight: '500', lineHeight: 20 },
+  infoText: {
+    fontSize: 14,
+    color: "#0A2FCC",
+    fontWeight: "500",
+    lineHeight: 20,
+  },
 
   btnPrimary: {
-    backgroundColor: '#0A2FCC', borderRadius: 16,
-    paddingVertical: 17, alignItems: 'center', marginBottom: 20,
-    shadowColor: '#0A2FCC', shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3, shadowRadius: 12, elevation: 6,
+    backgroundColor: "#0A2FCC",
+    borderRadius: 16,
+    paddingVertical: 17,
+    alignItems: "center",
+    marginBottom: 20,
+    shadowColor: "#0A2FCC",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 6,
   },
-  btnPrimaryDisabled: { backgroundColor: '#93A3D4', shadowOpacity: 0, elevation: 0 },
-  btnPrimaryText: { fontSize: 16, fontWeight: '800', color: '#fff', letterSpacing: 0.3 },
+  btnPrimaryDisabled: {
+    backgroundColor: "#93A3D4",
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  btnPrimaryText: {
+    fontSize: 16,
+    fontWeight: "800",
+    color: "#fff",
+    letterSpacing: 0.3,
+  },
 
   termsText: {
-    fontSize: 13, color: '#6B7280',
-    textAlign: 'center', lineHeight: 20, marginBottom: 32,
+    fontSize: 13,
+    color: "#6B7280",
+    textAlign: "center",
+    lineHeight: 20,
+    marginBottom: 32,
   },
-  termsLink: { color: '#0A2FCC', fontWeight: '700' },
+  termsLink: { color: "#0A2FCC", fontWeight: "700" },
 
   securityBanner: {
-    backgroundColor: '#EEF2FF', borderRadius: 14,
-    paddingVertical: 16, paddingHorizontal: 20, alignItems: 'center',
+    backgroundColor: "#EEF2FF",
+    borderRadius: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    alignItems: "center",
   },
-  securityText: { fontSize: 14, color: '#0A2FCC', fontWeight: '600' },
+  securityText: { fontSize: 14, color: "#0A2FCC", fontWeight: "600" },
 });
