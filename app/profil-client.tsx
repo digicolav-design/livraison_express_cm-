@@ -1,41 +1,76 @@
-import React from 'react';
+import { router } from "expo-router";
+import React from "react";
 import {
-  View, Text, TouchableOpacity, ScrollView,
-  StyleSheet, StatusBar, SafeAreaView,
-} from 'react-native';
-import { router } from 'expo-router';
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const SECTIONS = [
   {
-    title: 'Mon compte',
+    title: "Mon compte",
     items: [
-      { icon: '👤', iconBg: '#EEF2FF', label: 'Modifier mon profil', sub: null },
-      { icon: '📍', iconBg: '#EEF2FF', label: 'Adresses favorites', sub: 'Maison, Bureau' },
-      { icon: '🔔', iconBg: '#FFF8ED', label: 'Notifications', sub: null },
+      {
+        icon: "👤",
+        iconBg: "#EEF2FF",
+        label: "Modifier mon profil",
+        sub: null,
+      },
+      {
+        icon: "📍",
+        iconBg: "#EEF2FF",
+        label: "Adresses favorites",
+        sub: "Maison, Bureau",
+      },
+      { icon: "🔔", iconBg: "#FFF8ED", label: "Notifications", sub: null },
     ],
   },
   {
-    title: 'Paiement',
+    title: "Paiement",
     items: [
-      { icon: '📱', iconBg: '#F0FDF4', label: 'MTN MoMo', sub: '+237 6 71 23 45 67' },
-      { icon: '🧾', iconBg: '#FFF8ED', label: 'Mes factures', sub: null },
+      {
+        icon: "📱",
+        iconBg: "#F0FDF4",
+        label: "MTN MoMo",
+        sub: "+237 6 71 23 45 67",
+      },
+      { icon: "🧾", iconBg: "#FFF8ED", label: "Mes factures", sub: null },
     ],
   },
   {
-    title: 'Aide',
+    title: "Aide",
     items: [
-      { icon: '💬', iconBg: '#EEF2FF', label: 'Support client', sub: null },
-      { icon: '⭐', iconBg: '#FFF8ED', label: "Noter l'application", sub: null },
-      { icon: '📋', iconBg: '#EEF2FF', label: "Conditions d'utilisation", sub: null },
+      { icon: "💬", iconBg: "#EEF2FF", label: "Support client", sub: null },
+      {
+        icon: "⭐",
+        iconBg: "#FFF8ED",
+        label: "Noter l'application",
+        sub: null,
+      },
+      {
+        icon: "📋",
+        iconBg: "#EEF2FF",
+        label: "Conditions d'utilisation",
+        sub: null,
+      },
     ],
   },
 ];
 
 const NAV_TABS = [
-  { icon: '🏠', label: 'Accueil', route: '/accueil-client', active: false },
-  { icon: '📦', label: 'Courses', route: '/historique', active: false },
-  { icon: '💳', label: 'Paiement', route: '/confirmer-paiement', active: false },
-  { icon: '👤', label: 'Profil', route: '/profil-client', active: true },
+  { icon: "🏠", label: "Accueil", route: "/accueil-client", active: false },
+  { icon: "📦", label: "Courses", route: "/historique", active: false },
+  {
+    icon: "💳",
+    label: "Paiement",
+    route: "/confirmer-paiement",
+    active: false,
+  },
+  { icon: "👤", label: "Profil", route: "/profil-client", active: true },
 ];
 
 export default function ProfilClientScreen() {
@@ -56,9 +91,9 @@ export default function ProfilClientScreen() {
         <Text style={styles.profilePhone}>+237 6 71 23 45 67</Text>
         <View style={styles.statsRow}>
           {[
-            { val: '47', label: 'Livraisons' },
-            { val: '4.8★', label: 'Ma note' },
-            { val: '32K', label: 'FCFA dépensé' },
+            { val: "47", label: "Livraisons" },
+            { val: "4.8★", label: "Ma note" },
+            { val: "32K", label: "FCFA dépensé" },
           ].map((stat) => (
             <View key={stat.label} style={styles.statBox}>
               <Text style={styles.statVal}>{stat.val}</Text>
@@ -79,9 +114,14 @@ export default function ProfilClientScreen() {
             {section.items.map((item, idx) => (
               <TouchableOpacity
                 key={idx}
-                style={[styles.sectionRow, idx > 0 && { borderTopWidth: 1, borderTopColor: '#F9FAFB' }]}
+                style={[
+                  styles.sectionRow,
+                  idx > 0 && { borderTopWidth: 1, borderTopColor: "#F9FAFB" },
+                ]}
               >
-                <View style={[styles.rowIcon, { backgroundColor: item.iconBg }]}>
+                <View
+                  style={[styles.rowIcon, { backgroundColor: item.iconBg }]}
+                >
                   <Text style={{ fontSize: 16 }}>{item.icon}</Text>
                 </View>
                 <View style={styles.rowContent}>
@@ -96,7 +136,7 @@ export default function ProfilClientScreen() {
 
         <TouchableOpacity
           style={styles.logoutBtn}
-          onPress={() => router.push('/')}
+          onPress={() => router.push("/")}
         >
           <Text style={styles.logoutText}>🚪 Se déconnecter</Text>
         </TouchableOpacity>
@@ -111,7 +151,11 @@ export default function ProfilClientScreen() {
           >
             <Text style={styles.navIcon}>{tab.icon}</Text>
             {tab.active && <View style={styles.navDot} />}
-            <Text style={[styles.navLabel, tab.active && styles.navLabelActive]}>{tab.label}</Text>
+            <Text
+              style={[styles.navLabel, tab.active && styles.navLabelActive]}
+            >
+              {tab.label}
+            </Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -120,66 +164,117 @@ export default function ProfilClientScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F5F4F0' },
+  container: { flex: 1, backgroundColor: "#F5F4F0" },
   header: {
-    backgroundColor: '#080C1A', paddingTop: 16,
-    paddingBottom: 36, alignItems: 'center', paddingHorizontal: 14,
+    backgroundColor: "#080C1A",
+    paddingTop: 16,
+    paddingBottom: 36,
+    alignItems: "center",
+    paddingHorizontal: 14,
   },
-  avatarWrap: { position: 'relative', marginBottom: 10 },
+  avatarWrap: { position: "relative", marginBottom: 10 },
   avatar: {
-    width: 68, height: 68, borderRadius: 20, backgroundColor: '#0A2FCC',
-    alignItems: 'center', justifyContent: 'center',
-    borderWidth: 3, borderColor: 'rgba(255,255,255,0.15)',
+    width: 68,
+    height: 68,
+    borderRadius: 20,
+    backgroundColor: "#0A2FCC",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 3,
+    borderColor: "rgba(255,255,255,0.15)",
   },
   editBadge: {
-    position: 'absolute', bottom: -4, right: -4,
-    width: 22, height: 22, backgroundColor: '#FFB800',
-    borderRadius: 6, alignItems: 'center', justifyContent: 'center',
+    position: "absolute",
+    bottom: -4,
+    right: -4,
+    width: 22,
+    height: 22,
+    backgroundColor: "#FFB800",
+    borderRadius: 6,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  profileName: { fontSize: 20, fontWeight: '800', color: '#fff', marginBottom: 4 },
-  profilePhone: { fontSize: 12, color: 'rgba(255,255,255,0.5)' },
-  statsRow: { flexDirection: 'row', gap: 10, marginTop: 14 },
+  profileName: {
+    fontSize: 20,
+    fontWeight: "800",
+    color: "#fff",
+    marginBottom: 4,
+  },
+  profilePhone: { fontSize: 12, color: "rgba(255,255,255,0.5)" },
+  statsRow: { flexDirection: "row", gap: 10, marginTop: 14 },
   statBox: {
-    backgroundColor: 'rgba(255,255,255,0.08)', borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)', borderRadius: 11,
-    paddingHorizontal: 16, paddingVertical: 9, alignItems: 'center',
+    backgroundColor: "rgba(255,255,255,0.08)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.1)",
+    borderRadius: 11,
+    paddingHorizontal: 16,
+    paddingVertical: 9,
+    alignItems: "center",
   },
-  statVal: { fontSize: 17, fontWeight: '800', color: '#FFB800' },
-  statLabel: { fontSize: 9, color: 'rgba(255,255,255,0.45)', marginTop: 2 },
+  statVal: { fontSize: 17, fontWeight: "800", color: "#FFB800" },
+  statLabel: { fontSize: 9, color: "rgba(255,255,255,0.45)", marginTop: 2 },
   scroll: { flex: 1 },
   scrollContent: { padding: 12, paddingBottom: 30 },
   section: {
-    backgroundColor: '#fff', borderRadius: 14, marginBottom: 10,
-    overflow: 'hidden', shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 6, elevation: 2,
+    backgroundColor: "#fff",
+    borderRadius: 14,
+    marginBottom: 10,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 2,
   },
   sectionTitle: {
-    fontSize: 10, fontWeight: '700', textTransform: 'uppercase',
-    letterSpacing: 1, color: '#9CA3AF',
-    paddingHorizontal: 14, paddingTop: 12, paddingBottom: 6,
+    fontSize: 10,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    color: "#9CA3AF",
+    paddingHorizontal: 14,
+    paddingTop: 12,
+    paddingBottom: 6,
   },
   sectionRow: {
-    flexDirection: 'row', alignItems: 'center',
-    paddingHorizontal: 14, paddingVertical: 11, gap: 11,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+    gap: 11,
   },
-  rowIcon: { width: 34, height: 34, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  rowIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   rowContent: { flex: 1 },
-  rowLabel: { fontSize: 13, fontWeight: '600', color: '#111827' },
-  rowSub: { fontSize: 11, color: '#9CA3AF', marginTop: 1 },
-  rowArrow: { fontSize: 16, color: '#9CA3AF' },
+  rowLabel: { fontSize: 13, fontWeight: "600", color: "#111827" },
+  rowSub: { fontSize: 11, color: "#9CA3AF", marginTop: 1 },
+  rowArrow: { fontSize: 16, color: "#9CA3AF" },
   logoutBtn: {
-    backgroundColor: '#FEF2F2', borderWidth: 1,
-    borderColor: 'rgba(255,77,77,0.2)', borderRadius: 13,
-    paddingVertical: 13, alignItems: 'center', marginBottom: 10,
+    backgroundColor: "#FEF2F2",
+    borderWidth: 1,
+    borderColor: "rgba(255,77,77,0.2)",
+    borderRadius: 13,
+    paddingVertical: 13,
+    alignItems: "center",
+    marginBottom: 10,
   },
-  logoutText: { fontSize: 14, fontWeight: '700', color: '#FF4D4D' },
+  logoutText: { fontSize: 14, fontWeight: "700", color: "#FF4D4D" },
   bottomNav: {
-    backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#F3F4F6',
-    flexDirection: 'row', paddingBottom: 8, paddingTop: 6,
+    backgroundColor: "#fff",
+    borderTopWidth: 1,
+    borderTopColor: "#F3F4F6",
+    flexDirection: "row",
+    paddingBottom: 8,
+    paddingTop: 6,
   },
-  navTab: { flex: 1, alignItems: 'center', gap: 2 },
+  navTab: { flex: 1, alignItems: "center", gap: 2 },
   navIcon: { fontSize: 20 },
-  navDot: { width: 4, height: 4, backgroundColor: '#0A2FCC', borderRadius: 2 },
-  navLabel: { fontSize: 9, fontWeight: '600', color: '#9CA3AF' },
-  navLabelActive: { color: '#0A2FCC' },
+  navDot: { width: 4, height: 4, backgroundColor: "#0A2FCC", borderRadius: 2 },
+  navLabel: { fontSize: 9, fontWeight: "600", color: "#9CA3AF" },
+  navLabelActive: { color: "#0A2FCC" },
 });

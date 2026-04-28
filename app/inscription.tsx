@@ -118,7 +118,12 @@ export default function InscriptionScreen() {
 
       if (error) {
         console.log("Erreur Auth:", error.message);
-        return;
+        // 👉 même en cas d’erreur, on redirige (sauf si email vide)
+        if (error.message.includes("rate limit")) {
+          console.log("Trop de tentatives, redirection quand même...");
+
+          return;
+        }
       }
 
       // 🔥 Récupération sécurisée du user

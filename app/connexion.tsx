@@ -29,9 +29,9 @@ export default function ConnexionScreen() {
 
     try {
       // 🔐 Connexion avec Supabase
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithOtp({
         email: email,
-        password: "12345678", // ⚠️ même mot de passe que lors de l'inscription
+        //password: "12345678", // ⚠️ même mot de passe que lors de l'inscription
       });
 
       if (error) {
@@ -39,10 +39,17 @@ export default function ConnexionScreen() {
         return;
       }
 
-      console.log("Utilisateur connecté:", data.user?.id);
+      console.log("OTP envoyé à:", email);
+
+      // 🔥 Redirection vers OTP
+      router.push({
+        pathname: "/verification-OTP",
+        params: { email },
+      });
+
+      console.log("OTP envoyé, utilisateur pas encore connecté");
 
       // ✅ Redirection vers l'accueil
-      router.push("/");
     } catch (err) {
       console.log("Erreur générale:", err);
     }

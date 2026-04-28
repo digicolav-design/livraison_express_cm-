@@ -39,12 +39,9 @@ export default function VerificationOTPScreen() {
       console.log("Code incomplet");
       return;
     }
-    if (!email) {
-      console.log("Email manquant ❌");
-      return;
-    }
+
     const { data, error } = await supabase.auth.verifyOtp({
-      email: email,
+      email: String(email),
       token: codeComplet,
       type: "email",
     });
@@ -54,32 +51,32 @@ export default function VerificationOTPScreen() {
       return;
     }
 
+    // ✅ ICI on récupère le user
     const user = data.user;
 
     if (!user) {
-      console.log("Utilisateur introuvable ❌");
+      console.log("Utilisateur introuvable");
       return;
     }
+    console.log("Utilisateur connecté:", user.id);
 
-    console.log("USER CONNECTÉ:", user.id);
-
-    // 🔥 INSERTION ICI (APRÈS OTP)
-    const { error: insertError } = await supabase.from("users").insert([
+    // ✅ INSERTION APRÈS VALIDATION
+    const { error: insertError } = await supabase.from("users").upsert([
       {
         id: user.id,
+        full_name: "Nom temporaire", // ⚠️ à remplacer si besoin
         email: user.email,
-        role: "client",
       },
     ]);
 
     if (insertError) {
       console.log("Erreur insertion:", insertError.message);
-      return;
+    } else {
+      console.log("✅ Utilisateur enregistré en base de données");
     }
 
-    console.log("✅ Utilisateur enregistré");
-
-    router.push("/accueil-client");
+    // ✅ Redirection finale
+    router.replace("/accueil-client");
   };
 
   return (
@@ -95,8 +92,8 @@ export default function VerificationOTPScreen() {
         </View>
         <Text style={styles.headerTitle}>Code de vérification</Text>
         <Text style={styles.headerSub}>
-          Code envoyé a ton email{" "}
-          <Text style={{ color: "#FFB800" }}>+237 6 71 23 45 67</Text>
+          Code OTP envoyé à {""}
+          <Text style={{ color: "#FFB800" }}>{email}</Text>
         </Text>
       </View>
 
