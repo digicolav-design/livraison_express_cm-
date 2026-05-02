@@ -1,8 +1,9 @@
 import React from 'react';
 import {
   View, Text, TouchableOpacity, ScrollView,
-  StyleSheet, StatusBar, SafeAreaView,
+  StyleSheet, StatusBar,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 
 export default function SplashScreen() {
@@ -42,7 +43,7 @@ export default function SplashScreen() {
         {/* BOUTONS */}
         <TouchableOpacity
           style={styles.btnYellow}
-          onPress={() => router.push('/inscription')}
+          onPress={() => router.push('/inscription (1)')}
         >
           <Text style={styles.btnYellowText}>Commencer →</Text>
         </TouchableOpacity>

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import {
   View, Text, TouchableOpacity, ScrollView,
-  StyleSheet, StatusBar, SafeAreaView,
+  StyleSheet, StatusBar,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 
 export default function LivraisonConfirmerScreen() {
@@ -67,7 +68,7 @@ export default function LivraisonConfirmerScreen() {
 
         <TouchableOpacity
           style={styles.doneBtn}
-          onPress={() => router.push('/accueil-client')}
+         onPress={() => router.push('/historique')}
         >
           <Text style={styles.doneBtnText}>✓ Envoyer ma note</Text>
         </TouchableOpacity>

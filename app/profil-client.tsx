@@ -1,8 +1,9 @@
 import React from 'react';
 import {
   View, Text, TouchableOpacity, ScrollView,
-  StyleSheet, StatusBar, SafeAreaView,
+  StyleSheet, StatusBar,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 
 const SECTIONS = [
@@ -96,7 +97,7 @@ export default function ProfilClientScreen() {
 
         <TouchableOpacity
           style={styles.logoutBtn}
-          onPress={() => router.push('/')}
+          onPress={() => router.replace('/')}
         >
           <Text style={styles.logoutText}>🚪 Se déconnecter</Text>
         </TouchableOpacity>

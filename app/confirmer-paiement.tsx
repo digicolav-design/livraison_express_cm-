@@ -1,8 +1,9 @@
 import React from 'react';
 import {
   View, Text, TouchableOpacity, ScrollView,
-  StyleSheet, StatusBar, SafeAreaView,
+  StyleSheet, StatusBar,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 
 export default function ConfirmerPaiementScreen() {
@@ -72,7 +73,7 @@ export default function ConfirmerPaiementScreen() {
 
         <TouchableOpacity
           style={styles.payBtn}
-          onPress={() => router.push('/')}
+          onPress={() => router.push('/livraison-confirmer')}
         >
           <Text style={styles.payBtnText}>💳 Payer 1 760 FCFA maintenant</Text>
         </TouchableOpacity>

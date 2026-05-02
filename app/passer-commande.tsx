@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import {
   View, Text, TouchableOpacity, ScrollView,
-  StyleSheet, StatusBar, SafeAreaView,
+  StyleSheet, StatusBar,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 
 export default function PasserCommandeScreen() {
@@ -117,7 +118,7 @@ export default function PasserCommandeScreen() {
 
         <TouchableOpacity
           style={styles.orderBtn}
-          onPress={() => router.push('/')}
+          onPress={() => router.push('/confirmer-paiement')}
         >
           <Text style={styles.orderBtnText}>🚗 Commander · 1 760 FCFA</Text>
         </TouchableOpacity>
