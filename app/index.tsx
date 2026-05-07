@@ -1,10 +1,14 @@
-import React from 'react';
+import { router } from "expo-router";
+import React from "react";
 import {
-  View, Text, TouchableOpacity, ScrollView,
-  StyleSheet, StatusBar,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SplashScreen() {
   return (
@@ -22,7 +26,7 @@ export default function SplashScreen() {
 
         {/* TITRE */}
         <Text style={styles.title}>
-          Livraison{'\n'}
+          Livraison{"\n"}
           <Text style={styles.titleYellow}>Express CM</Text>
         </Text>
 
@@ -33,7 +37,7 @@ export default function SplashScreen() {
 
         {/* PILLS */}
         <View style={styles.pillsRow}>
-          {['📦 Colis', '🍔 Repas', '💊 Médicaments', '📄 Docs'].map((pill) => (
+          {["📦 Colis", "🍔 Repas", "💊 Médicaments", "📄 Docs"].map((pill) => (
             <View key={pill} style={styles.pill}>
               <Text style={styles.pillText}>{pill}</Text>
             </View>
@@ -43,14 +47,14 @@ export default function SplashScreen() {
         {/* BOUTONS */}
         <TouchableOpacity
           style={styles.btnYellow}
-          onPress={() => router.push('/inscription (1)')}
+          onPress={() => router.push("/inscription")}
         >
           <Text style={styles.btnYellowText}>Commencer →</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.btnGhost}
-          onPress={() => router.push('/connexion')}
+          onPress={() => router.push("/connexion")}
         >
           <Text style={styles.btnGhostText}>J'ai déjà un compte</Text>
         </TouchableOpacity>
@@ -65,12 +69,12 @@ export default function SplashScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#050A20',
+    backgroundColor: "#050A20",
   },
   scrollContent: {
     flexGrow: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingHorizontal: 28,
     paddingVertical: 40,
   },
@@ -78,71 +82,75 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 24,
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: "rgba(255,255,255,0.08)",
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.14)',
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderColor: "rgba(255,255,255,0.14)",
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 18,
   },
   logoIcon: { fontSize: 38 },
   title: {
     fontSize: 26,
-    fontWeight: '800',
-    color: '#fff',
-    textAlign: 'center',
+    fontWeight: "800",
+    color: "#fff",
+    textAlign: "center",
     lineHeight: 32,
     marginBottom: 10,
   },
-  titleYellow: { color: '#FFB800' },
+  titleYellow: { color: "#FFB800" },
   subtitle: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.45)',
-    textAlign: 'center',
+    color: "rgba(255,255,255,0.45)",
+    textAlign: "center",
     lineHeight: 20,
     marginBottom: 20,
     maxWidth: 220,
   },
   pillsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
     gap: 6,
     marginBottom: 28,
   },
   pill: {
-    backgroundColor: 'rgba(255,255,255,0.07)',
+    backgroundColor: "rgba(255,255,255,0.07)",
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: "rgba(255,255,255,0.1)",
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
-  pillText: { fontSize: 11, color: 'rgba(255,255,255,0.65)' },
+  pillText: { fontSize: 11, color: "rgba(255,255,255,0.65)" },
   btnYellow: {
-    backgroundColor: '#FFB800',
+    backgroundColor: "#FFB800",
     borderRadius: 13,
     paddingVertical: 14,
-    width: '100%',
-    alignItems: 'center',
+    width: "100%",
+    alignItems: "center",
     marginBottom: 10,
-    shadowColor: '#FFB800',
+    shadowColor: "#FFB800",
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.3,
     shadowRadius: 10,
     elevation: 6,
   },
-  btnYellowText: { fontSize: 15, fontWeight: '700', color: '#080C1A' },
+  btnYellowText: { fontSize: 15, fontWeight: "700", color: "#080C1A" },
   btnGhost: {
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: "rgba(255,255,255,0.06)",
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: "rgba(255,255,255,0.1)",
     borderRadius: 13,
     paddingVertical: 13,
-    width: '100%',
-    alignItems: 'center',
+    width: "100%",
+    alignItems: "center",
     marginBottom: 30,
   },
-  btnGhostText: { fontSize: 13, color: 'rgba(255,255,255,0.8)', fontWeight: '500' },
-  footer: { fontSize: 11, color: 'rgba(255,255,255,0.2)', textAlign: 'center' },
+  btnGhostText: {
+    fontSize: 13,
+    color: "rgba(255,255,255,0.8)",
+    fontWeight: "500",
+  },
+  footer: { fontSize: 11, color: "rgba(255,255,255,0.2)", textAlign: "center" },
 });

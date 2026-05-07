@@ -1,6 +1,7 @@
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
+  Alert,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -9,11 +10,67 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { supabase } from "../lib/supabase";
 
 export default function PasserCommandeScreen() {
   const [typeSelected, setTypeSelected] = useState("standard");
   const [paySelected, setPaySelected] = useState("momo");
 
+  const [pickupAddress] = useState("Carrefour Nlongkak");
+  const [deliveryAddress] = useState("");
+
+  const handleOrder = async () => {
+    try {
+      // 🔐 récupérer user connecté
+      const { data: userData, error: userError } =
+        await supabase.auth.getUser();
+
+      if (userError || !userData?.user) {
+        Alert.alert("Erreur", "Utilisateur non connecté");
+        return;
+      }
+
+      const userId = userData.user.id;
+
+      // ❌ validation minimale
+      if (!deliveryAddress || deliveryAddress.trim() === "") {
+        Alert.alert("Erreur", "Veuillez renseigner la destination");
+        return;
+      }
+
+      // 💾 INSERT BASE DE DONNÉES
+      const { data, error } = await supabase
+        .from("deliveries")
+        .insert({
+          client_id: userId,
+          pickup_address: pickupAddress,
+          delivery_address: deliveryAddress,
+          price: typeSelected === "express" ? 2260 : 1760,
+          status: "pending",
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.log("INSERT ERROR:", error.message);
+        Alert.alert("Erreur", "Impossible de créer la commande");
+        return;
+      }
+
+      // 🚀 redirection
+      router.push({
+        pathname: "/confirmer-paiement",
+        params: {
+          deliveryId: data.id,
+          amount: typeSelected === "express" ? 2260 : 1760,
+          method: paySelected,
+        },
+      });
+    } catch (err) {
+      console.log(err);
+      Alert.alert("Erreur", "Une erreur est survenue");
+    }
+  };
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
