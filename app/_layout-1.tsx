@@ -14,6 +14,18 @@ export default function RootLayout() {
       <Stack.Screen name="livraison-confirmer" />
       <Stack.Screen name="historique" />
       <Stack.Screen name="profil-client" />
+      <Stack.Screen name="inscription_coursier" />
+      <Stack.Screen name="profil_coursier" />
+      <Stack.Screen name="validation_coursier" />
+      <Stack.Screen name="notification_coursier"/>
+      <Stack.Screen name="dashboard_coursier"/>
+      <Stack.Screen name="RejetPage"/>
+      <Stack.Screen name="UniversalMap"/>
+      <Stack.Screen name="navigation_coursier"/>
+      
+      
+      
+
     </Stack>
   );
 }

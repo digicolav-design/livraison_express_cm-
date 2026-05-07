@@ -47,10 +47,11 @@ export default function SplashScreen() {
         {/* BOUTONS */}
         <TouchableOpacity
           style={styles.btnYellow}
-          onPress={() => router.push("/inscription")}
+          onPress={() => router.push('/inscription')}
         >
           <Text style={styles.btnYellowText}>Commencer →</Text>
         </TouchableOpacity>
+
 
         <TouchableOpacity
           style={styles.btnGhost}
