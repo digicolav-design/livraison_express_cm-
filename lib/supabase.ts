@@ -1,6 +1,8 @@
+import "react-native-url-polyfill/auto";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from "react-native";
 import { createClient } from "@supabase/supabase-js";
+import ws from "ws";
 
 // ← La ligne react-native-url-polyfill a été supprimée
 
@@ -17,4 +19,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     detectSessionInUrl: false,
   },
-});
+  realtime: {
+    transport: ws,
+  },
+}
+);
