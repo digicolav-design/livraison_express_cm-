@@ -24,24 +24,34 @@ export default function ConnexionScreen() {
   const emailValide = email.includes("@") && email.includes(".");
 
   const handleSoumettre = async () => {
+    console.log("EMAIL SUBMIT:", email);
     setSoumis(true);
     if (!emailValide) return;
     setChargement(true);
 
     try {
+      // Nettoyer ancienne session en cas de connexon repetees
+      await supabase.auth.signOut();
+
       console.log("📩 Envoi OTP à:", email.trim());
 
       const { data, error } = await supabase.auth.signInWithOtp({
         email: email.trim(),
+        options: {
+          shouldCreateUser: false,
+        },
       });
 
-      console.log("DATA:", data);
-      console.log("ERROR:", error);
+      console.log("OTP DATA:", JSON.stringify(data, null, 2));
+      console.log("OTP ERROR:", error);
 
       if (error) {
         Alert.alert("Erreur Supabase", error.message);
         return;
       }
+      console.log("✅ OTP envoyé avec succès");
+
+      console.log("🚀 REDIRECTION OTP");
 
       // IMPORTANT: redirection FORCÉE
       router.push({

@@ -56,6 +56,7 @@ export default function PasserCommandeScreen() {
         Alert.alert("Erreur", "Impossible de créer la commande");
         return;
       }
+      console.log("DELIVERY CREATED SUCCESS:", data);
 
       // 🚀 redirection
       router.push({

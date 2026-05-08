@@ -15,7 +15,7 @@ import { supabase } from "../lib/supabase";
 
 export default function VerificationOTPScreen() {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
-  const [tempsRestant, setTempsRestant] = useState(47);
+  const [tempsRestant, setTempsRestant] = useState(300);
   const [expire, setExpire] = useState(false);
   const [erreurCode, setErreurCode] = useState("");
   const [chargement, setChargement] = useState(false);
@@ -117,7 +117,7 @@ export default function VerificationOTPScreen() {
       Alert.alert("Erreur", "Impossible de renvoyer le code.");
     } else {
       setCode(["", "", "", "", "", ""]);
-      setTempsRestant(47);
+      setTempsRestant(180);
       setExpire(false);
       setErreurCode("");
     }

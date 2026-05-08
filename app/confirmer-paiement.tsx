@@ -14,6 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ConfirmerPaiementScreen() {
   const { deliveryId, amount, method } = useLocalSearchParams();
+  console.log("PARAMS:", deliveryId, amount, method);
 
   const handlePayment = async () => {
     const { data: userData } = await supabase.auth.getUser();
@@ -35,6 +36,7 @@ export default function ConfirmerPaiementScreen() {
       Alert.alert("Erreur", "Paiement non enregistré");
       return;
     }
+    console.log("PAYMENT CREATED SUCCESS");
 
     router.push({
       pathname: "/livraison-confirmer",
