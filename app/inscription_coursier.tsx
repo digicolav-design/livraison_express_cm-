@@ -1,5 +1,5 @@
 import * as DocumentPicker from "expo-document-picker";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   Alert,
@@ -8,13 +8,13 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
+import { supabase } from "../lib/supabase";
 
 {
   /*definition type document*/
 }
-import { supabase } from "../lib/supabase";
 //import * as FileSystem from "expo-file-system";
 type Documents = {
   cni: any | null;
@@ -58,82 +58,113 @@ export default function CourierRegistration() {
     /*champ obligatoire*/
   }
   //permettra de prende un fichier pdf  l'envoyer sur supabase storage et retourner l'url du fichier
-  const uploadDocument = async ( 
-  file: any,
-  folder: string,
-  userId: string
-) => {
-  try {
-    const response = await fetch(file.uri);// il lit le  pdf telecharge
-    const blob = await response.blob();//transforme le fichier en format uploadable
+  const uploadDocument = async (file: any, folder: string, userId: string) => {
+    try {
+      if (!file?.uri) {
+        console.log("File invalide", file);
+        return null;
+      }
+      const response = await fetch(file.uri); // il lit le  pdf telecharge
+      const blob = await response.blob(); //transforme le fichier en format uploadable
 
-    const filePath = `${userId}/${folder}-${Date.now()}.pdf`; // cree un chemin unique
+      const filePath = `${userId}/${folder}-${Date.now()}.pdf`; // cree un chemin unique
 
-    const { error } = await supabase.storage
-      .from("riders-documents")
-      .upload(filePath, blob, {
-        contentType: "application/pdf",
-      });
+      const { error } = await supabase.storage
+        .from("profils-riders")
+        .upload(filePath, blob, {
+          contentType: "application/pdf",
+        });
 
-    if (error) {
-      console.log("Erreur upload:", error.message);
+      if (error) {
+        console.log("Erreur upload:", error.message);
+        return null;
+      }
+
+      const { data } = supabase.storage
+        .from("profils-riders")
+        .getPublicUrl(filePath); // retourne l'url du document
+
+      return data.publicUrl;
+    } catch (err) {
+      console.log(err);
       return null;
     }
-
-    const { data } = supabase.storage
-      .from("riders-documents")
-      .getPublicUrl(filePath); // retourne l'url du document
-
-    return data.publicUrl;
-  } catch (err) {
-    console.log(err);
-    return null;
-  }
-};
+  };
   const handleSubmit = async () => {
-  if (
-    !nom ||
-    !email ||
-    Object.values(documents).some((doc) => doc === null)
-  ) {
-    Alert.alert(
-      "Attention",
-      "Veuillez remplir tous les champs et importer tous les documents."
-    );
-    return;
-  }
-
-  try {
-    setLoading(true);
-
-    // récupérer utilisateur connecté
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-
-    if (userError || !user) {
-      Alert.alert(
-        "Erreur",
-        "Utilisateur non connecté."
-      );
+    if (
+      !nom ||
+      !email ||
+      Object.values(documents).some((doc) => doc === null)
+    ) {
+      Alert.alert("Attention", "Veuillez remplir tous les champs.");
       return;
     }
 
-    console.log("Utilisateur connecté :", user.id);
-    router.push("/validation_coursier");
+    try {
+      setLoading(true);
 
-  } catch (error) {
-    console.log(error);
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
 
-    Alert.alert(
-      "Erreur",
-      "Une erreur est survenue."
-    );
-  } finally {
-    setLoading(false);
-  }
-};
+      if (userError || !user) {
+        Alert.alert("Erreur", "Utilisateur non connecté.");
+        return;
+      }
+
+      // 1. UPLOAD des fichiers et chagement en url
+      const cniUrl = await uploadDocument(documents.cni, "cni", user.id);
+      const permisUrl = await uploadDocument(
+        documents.permis,
+        "permis",
+        user.id,
+      );
+      const carteGriseUrl = await uploadDocument(
+        documents.carteGrise,
+        "carteGrise",
+        user.id,
+      );
+      const assuranceUrl = await uploadDocument(
+        documents.assurance,
+        "assurance",
+        user.id,
+      );
+      if (!cniUrl) console.log("CNI upload failed");
+      if (!permisUrl) console.log("Permis upload failed");
+      if (!carteGriseUrl) console.log("Carte grise upload failed");
+      if (!assuranceUrl) console.log("Assurance upload failed");
+
+      // 2. UPDATE table users (TES COLONNES EXACTES)
+      const { error: updateError } = await supabase
+        .from("users")
+        .update({
+          full_name: nom,
+          email: email,
+          cni: cniUrl,
+          permis: permisUrl,
+          carteGrise: carteGriseUrl,
+          assurance: assuranceUrl,
+          demande_coursier: "en_attente",
+        })
+        .eq("id", user.id);
+
+      if (updateError) {
+        console.log(updateError);
+        Alert.alert("Erreur", "Impossible de sauvegarder les données.");
+        return;
+      }
+
+      console.log("Utilisateur connecté :", user.id);
+      router.push("/validation_coursier");
+    } catch (error) {
+      console.log(error);
+
+      Alert.alert("Erreur", "Une erreur est survenue.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -198,16 +229,11 @@ export default function CourierRegistration() {
           </TouchableOpacity>
         ))}
 
-       <TouchableOpacity
-  style={styles.submitButton}
-  onPress={handleSubmit}
->
-  <Text style={styles.submitText}>
-    {loading
-      ? "Envoi en cours..."
-      : "Soumettre ma demande"}
-  </Text>
-</TouchableOpacity>
+        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+          <Text style={styles.submitText}>
+            {loading ? "Envoi en cours..." : "Soumettre ma demande"}
+          </Text>
+        </TouchableOpacity>
 
         <Text style={styles.validationMsg}>
           Validation sous 72h max après soumission des documents complet
