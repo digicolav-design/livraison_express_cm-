@@ -17,9 +17,12 @@ export default function PasserCommandeScreen() {
   const [paySelected, setPaySelected] = useState("momo");
 
   const [pickupAddress] = useState("Carrefour Nlongkak");
-  const [deliveryAddress] = useState("");
+  //const [deliveryAddress] = useState(""); Ajouter une adresse de livraison par défaut
+  const [deliveryAddress, setDeliveryAddress] = useState("Yassa");
 
   const handleOrder = async () => {
+    console.log("🚀 START ORDER");
+
     try {
       // 🔐 récupérer user connecté
       const { data: userData, error: userError } =
@@ -42,7 +45,7 @@ export default function PasserCommandeScreen() {
       const { data, error } = await supabase
         .from("deliveries")
         .insert({
-          client_id: userId,
+          user_id: userId,
           pickup_address: pickupAddress,
           delivery_address: deliveryAddress,
           price: typeSelected === "express" ? 2260 : 1760,
@@ -57,6 +60,10 @@ export default function PasserCommandeScreen() {
         return;
       }
       console.log("DELIVERY CREATED SUCCESS:", data);
+      if (!data?.id) {
+        Alert.alert("Erreur", "Commande non créée");
+        return;
+      }
 
       // 🚀 redirection
       router.push({
@@ -206,11 +213,10 @@ export default function PasserCommandeScreen() {
           ))}
         </View>
 
-        <TouchableOpacity
-          style={styles.orderBtn}
-          onPress={() => router.push("/confirmer-paiement")}
-        >
-          <Text style={styles.orderBtnText}>🚗 Commander · 1 760 FCFA</Text>
+        <TouchableOpacity style={styles.orderBtn} onPress={handleOrder}>
+          <Text style={styles.orderBtnText}>
+            🚗 Commander · {typeSelected === "express" ? "2 260" : "1 760"} FCFA
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
