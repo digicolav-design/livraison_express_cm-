@@ -1,4 +1,7 @@
+import { decode } from "base64-arraybuffer";
 import * as DocumentPicker from "expo-document-picker";
+import "expo-file-system/build/index";
+import * as FileSystem from "expo-file-system/legacy";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -15,7 +18,7 @@ import { supabase } from "../lib/supabase";
 {
   /*definition type document*/
 }
-//import * as FileSystem from "expo-file-system";
+
 type Documents = {
   cni: any | null;
   permis: any | null;
@@ -60,19 +63,29 @@ export default function CourierRegistration() {
   //permettra de prende un fichier pdf  l'envoyer sur supabase storage et retourner l'url du fichier
   const uploadDocument = async (file: any, folder: string, userId: string) => {
     try {
-      if (!file?.uri) {
-        console.log("File invalide", file);
+      /*{console.log("File invalide", file);return null;}*/
+      const fileUri = file?.uri || file?.assets?.[0]?.uri;
+
+      if (!fileUri) {
+        console.log("Fichier invalide");
         return null;
       }
-      const response = await fetch(file.uri); // il lit le  pdf telecharge
-      const blob = await response.blob(); //transforme le fichier en format uploadable
+
+      console.log("UPLOAD URI:", fileUri);
+
+      const fileBase64 = await FileSystem.readAsStringAsync(fileUri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+      //const response = await fetch(file.uri); // il lit le  pdf telecharge
+      //const blob = await response.blob(); //transforme le fichier en format uploadable
 
       const filePath = `${userId}/${folder}-${Date.now()}.pdf`; // cree un chemin unique
 
       const { error } = await supabase.storage
-        .from("profils-riders")
-        .upload(filePath, blob, {
+        .from("profil-riders")
+        .upload(filePath, decode(fileBase64), {
           contentType: "application/pdf",
+          upsert: true,
         });
 
       if (error) {
@@ -81,12 +94,13 @@ export default function CourierRegistration() {
       }
 
       const { data } = supabase.storage
-        .from("profils-riders")
+        .from("profil-riders")
         .getPublicUrl(filePath); // retourne l'url du document
+      console.log("UPLOAD SUCCESS", data.publicUrl);
 
       return data.publicUrl;
     } catch (err) {
-      console.log(err);
+      console.log("Upload catch:", err);
       return null;
     }
   };
@@ -130,10 +144,11 @@ export default function CourierRegistration() {
         "assurance",
         user.id,
       );
-      if (!cniUrl) console.log("CNI upload failed");
-      if (!permisUrl) console.log("Permis upload failed");
-      if (!carteGriseUrl) console.log("Carte grise upload failed");
-      if (!assuranceUrl) console.log("Assurance upload failed");
+      if (!cniUrl || !permisUrl || !carteGriseUrl || !assuranceUrl) {
+        setLoading(false);
+        Alert.alert("Erreur", "Certains documents n'ont pas pu être uploadés.");
+        return;
+      }
 
       // 2. UPDATE table users (TES COLONNES EXACTES)
       const { error: updateError } = await supabase
