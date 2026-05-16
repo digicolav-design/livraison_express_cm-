@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 
@@ -15,7 +17,7 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-
+  const [demandesCoursiers, setDemandesCoursiers] = useState<any[]>([]);
   // ─────────────────────────────
   // Charger les statistiques
   // ─────────────────────────────
@@ -32,12 +34,49 @@ export default function AdminDashboard() {
       }
 
       setStats(data);
+      const { data: demandes } = await supabase
+        .from("users")
+        .select("*")
+        .eq("demande_coursier", "en_attente");
+
+      setDemandesCoursiers(demandes || []);
     } catch (err) {
       console.log("Erreur:", err);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
+  };
+  // =====================================================
+  // VALIDER
+  // =====================================================
+
+  const validerCoursier = async (id: string) => {
+    await supabase
+      .from("users")
+      .update({
+        demande_coursier: "valide",
+      })
+      .eq("id", id);
+
+    chargerDashboard();
+    Alert.alert("Succès", "Le coursier a été validé.");
+  };
+
+  // =====================================================
+  // REFUSER
+  // =====================================================
+
+  const refuserCoursier = async (id: string) => {
+    await supabase
+      .from("users")
+      .update({
+        demande_coursier: "refuse",
+      })
+      .eq("id", id);
+
+    chargerDashboard();
+    Alert.alert("Refus effectué", "La demande a été refusée.");
   };
 
   // ─────────────────────────────
@@ -65,10 +104,6 @@ export default function AdminDashboard() {
       </SafeAreaView>
     );
   }
-
-  // ─────────────────────────────
-  // UI
-  // ─────────────────────────────
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -113,6 +148,48 @@ export default function AdminDashboard() {
           <Text style={styles.label}>Litiges ouverts</Text>
           <Text style={styles.value}>{stats?.open_disputes ?? 0}</Text>
         </View>
+        {/* ===================================== */}
+        {/* DEMANDES COURSIERS */}
+        {/* ===================================== */}
+
+        <Text style={styles.title}>🚴 Demandes Coursiers</Text>
+
+        {demandesCoursiers.length === 0 && (
+          <View style={styles.card}>
+            <Text>Aucune demande en attente</Text>
+          </View>
+        )}
+
+        {demandesCoursiers.map((item: any) => (
+          <View key={item.id} style={styles.card}>
+            <Text
+              style={{
+                fontWeight: "bold",
+                fontSize: 18,
+              }}
+            >
+              {item.full_name}
+            </Text>
+
+            <Text>{item.email}</Text>
+
+            <Text>{item.phone}</Text>
+
+            <TouchableOpacity
+              style={styles.validateBtn}
+              onPress={() => validerCoursier(item.id)}
+            >
+              <Text style={styles.btnText}>✅ Valider</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.rejectBtn}
+              onPress={() => refuserCoursier(item.id)}
+            >
+              <Text style={styles.btnText}>❌ Refuser</Text>
+            </TouchableOpacity>
+          </View>
+        ))}
       </ScrollView>
     </SafeAreaView>
   );
@@ -168,5 +245,26 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "800",
     color: "#0A2FCC",
+  },
+  validateBtn: {
+    backgroundColor: "#16A34A",
+    paddingVertical: 12,
+    borderRadius: 10,
+    marginTop: 10,
+    alignItems: "center",
+  },
+
+  rejectBtn: {
+    backgroundColor: "#DC2626",
+    paddingVertical: 12,
+    borderRadius: 10,
+    marginTop: 10,
+    alignItems: "center",
+  },
+
+  btnText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 15,
   },
 });

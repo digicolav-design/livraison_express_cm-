@@ -1,6 +1,5 @@
 import { decode } from "base64-arraybuffer";
 import * as DocumentPicker from "expo-document-picker";
-import "expo-file-system/build/index";
 import * as FileSystem from "expo-file-system/legacy";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -171,7 +170,12 @@ export default function CourierRegistration() {
       }
 
       console.log("Utilisateur connecté :", user.id);
-      router.push("/validation_coursier");
+      router.push({
+        pathname: "/validation_coursier",
+        params: {
+          submissionDate: new Date().toISOString(),
+        },
+      });
     } catch (error) {
       console.log(error);
 
