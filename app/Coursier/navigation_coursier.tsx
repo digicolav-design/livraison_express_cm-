@@ -11,12 +11,11 @@ import {
   Platform,
 } from "react-native";
 import * as Location from "expo-location";
-import UniversalMap from "./UniversalMap";
+import UniversalMap from "../UniversalMap"; 
 import { useLocalSearchParams, useRouter } from "expo-router";
-
 export default function NavigationGPSCoursier() {
   const { courseId } = useLocalSearchParams<{ courseId?: string }>();
-  const router = useRouter(); //  navigation Expo Router
+  const router = useRouter();
 
   //  Données mock (à remplacer par API / DB)
   const courseData = {
@@ -26,12 +25,12 @@ export default function NavigationGPSCoursier() {
     client: { name: "Paul Mbarga", phone: "+237690000000", photoUrl: null },
   };
 
-  //  États dynamiques
+  // États dynamiques
   const [distance, setDistance] = useState<number>(0);
   const [durationMinutes, setDurationMinutes] = useState<number>(0);
   const [estimatedArrival, setEstimatedArrival] = useState<string>("");
 
-  //  Point vert clignotant
+  // Point vert clignotant
   const opacity = useRef(new Animated.Value(1)).current;
   useEffect(() => {
     Animated.loop(
@@ -64,7 +63,7 @@ export default function NavigationGPSCoursier() {
       const position = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = position.coords;
 
-      // Calcul distance simple (Haversine)
+      // Haversine
       const R = 6371;
       const dLat = (courseData.pickup_address.latitude - latitude) * Math.PI / 180;
       const dLng = (courseData.pickup_address.longitude - longitude) * Math.PI / 180;
@@ -87,14 +86,14 @@ export default function NavigationGPSCoursier() {
     })();
   }, []);
 
-  // ✅ Action "J’ai récupéré le colis"
+  // Action "J’ai récupéré le colis"
   const handlePickup = () => {
     showAlert(
       "Confirmation",
       "Cliquez sur OK pour confirmer la récupération de votre colis",
       () => {
         showAlert("Notification envoyée", "🚚 En route pour votre livraison", () => {
-          router.push("/profil_coursier"); // ✅ navigation après alerte
+          router.push("/Coursier/confirmation_livraison_coursier");
         });
       }
     );
@@ -111,7 +110,10 @@ export default function NavigationGPSCoursier() {
 
       {/* ── Carte ── */}
       <View style={styles.mapContainer}>
-        <UniversalMap pickup_address={courseData.pickup_address} delivery_address={courseData.delivery_address} />
+        <UniversalMap
+          pickup_address={courseData.pickup_address}
+          delivery_address={courseData.delivery_address}
+        />
       </View>
 
       {/* ── Infos temps ── */}
@@ -152,7 +154,7 @@ export default function NavigationGPSCoursier() {
   );
 }
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
+// ─── Styles ────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#E8EEF7", padding: 16 },
   header: { flexDirection: "row", alignItems: "center", marginBottom: 12 },
@@ -176,6 +178,6 @@ const styles = StyleSheet.create({
   clientName: { fontSize: 15, fontWeight: "700" },
   clientAddress: { fontSize: 13, color: "#555" },
   msgButton: { fontSize: 24, marginLeft: 8 },
-  btnPickup: { backgroundColor: "#00C853", borderRadius: 12, padding: 14, alignItems: "center" },
-  btnPickupText: { color: "#fff", fontSize: 16, fontWeight: "800" },
+  btnPickup: { backgroundColor: "#00C853", borderRadius: 12, alignItems: "center" , marginBottom:100},
+  btnPickupText: { color: "#fff", fontSize: 16, fontWeight: "800", paddingBottom:160 },
 });

@@ -1,5 +1,5 @@
-import React from "react";
-import { Platform, Dimensions, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Dimensions } from "react-native";
 
 const { height } = Dimensions.get("window");
 
@@ -8,75 +8,46 @@ interface UniversalMapProps {
   delivery_address: { latitude: number; longitude: number };
 }
 
-const UniversalMap: React.FC<UniversalMapProps> = ({ pickup_address,  delivery_address }) => {
-  // ✅ Calcul du centre de la carte
-  const midLat = (pickup_address.latitude +  delivery_address.latitude) / 2;
-  const midLng = (pickup_address.longitude +  delivery_address.longitude) / 2;
+const UniversalMap: React.FC<UniversalMapProps> = ({ pickup_address, delivery_address }) => {
+  const [Leaflet, setLeaflet] = useState<any>(null);
 
-  // ─── Cas Web (Leaflet + OpenStreetMap) ───────────────────────────────
-  if (Platform.OS === "web") {
-    // ⚠️ Import dynamique → évite "window is not defined" côté mobile
-    const { MapContainer, TileLayer, Marker, Polyline } = require("react-leaflet");
-    require("leaflet/dist/leaflet.css");
+  useEffect(() => {
+    // Charger Leaflet uniquement côté client
+    if (typeof window !== "undefined") {
+      import("react-leaflet").then((mod) => {
+        setLeaflet(mod);
+        import("leaflet/dist/leaflet.css");
+      });
+    }
+  }, []);
 
-    return (
-      <MapContainer
-        center={[midLat, midLng]}
-        zoom={13}
-        style={{ width: "100%", height: height * 0.28 }}
-      >
-        {/* Fond de carte OpenStreetMap */}
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-
-        {/* Marqueurs départ et destination */}
-        <Marker position={[pickup_address.latitude, pickup_address.longitude]} />
-        <Marker position={[delivery_address.latitude, delivery_address.longitude]} />
-
-        {/* Ligne entre départ et destination */}
-        <Polyline
-          positions={[
-            [pickup_address.latitude, pickup_address.longitude],
-            [delivery_address.latitude, delivery_address.longitude],
-          ]}
-          pathOptions={{ color: "#4285F4", weight: 3 }}
-        />
-      </MapContainer>
-    );
+  if (!Leaflet) {
+    return <div style={{ width: "100%", height: height * 0.28 }}>Chargement de la carte...</div>;
   }
 
-  // ─── Cas Mobile (React Native Maps) ───────────────────────────────
-  const MapView = require("react-native-maps").default;
-  const { Marker: RNMarker, Polyline: RNPolyline, PROVIDER_GOOGLE } = require("react-native-maps");
+  const { MapContainer, TileLayer, Marker, Polyline } = Leaflet;
+
+  const midLat = (pickup_address.latitude + delivery_address.latitude) / 2;
+  const midLng = (pickup_address.longitude + delivery_address.longitude) / 2;
 
   return (
-    <MapView
-      provider={PROVIDER_GOOGLE}
-      style={styles.map}
-      region={{
-        latitude: midLat,
-        longitude: midLng,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,
-      }}
+    <MapContainer
+      center={[midLat, midLng]}
+      zoom={13}
+      style={{ width: "100%", height: height * 0.28 }}
     >
-      {/* Marqueurs départ et destination */}
-      <RNMarker coordinate={pickup_address} />
-      <RNMarker coordinate={delivery_address} />
-
-      {/* Ligne entre départ et destination */}
-      <RNPolyline
-        coordinates={[pickup_address, delivery_address]}
-        strokeColor="#4285F4"
-        strokeWidth={3}
+      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+      <Marker position={[pickup_address.latitude, pickup_address.longitude]} />
+      <Marker position={[delivery_address.latitude, delivery_address.longitude]} />
+      <Polyline
+        positions={[
+          [pickup_address.latitude, pickup_address.longitude],
+          [delivery_address.latitude, delivery_address.longitude],
+        ]}
+        pathOptions={{ color: "#4285F4", weight: 3 }}
       />
-    </MapView>
+    </MapContainer>
   );
 };
-
-const styles = StyleSheet.create({
-  map: {
-    ...StyleSheet.absoluteFillObject,
-  },
-});
 
 export default UniversalMap;

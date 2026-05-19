@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, TouchableOpacity, FlatList, Image, StyleSheet, Animated, ScrollView } from 'react-native';
 import { router, useRouter } from "expo-router";
-import { supabase } from "../lib/supabase";
+import { supabase } from "../../lib/supabase";
 
 interface Course {
   id: number;
@@ -85,7 +85,7 @@ export default function DashboardCoursier() {
         <Text style={styles.balanceLabel}>Mon Solde</Text>
         <Text style={styles.balanceText}>{solde} FCFA</Text>
         <TouchableOpacity style={styles.retraitBtn}>
-          <Text style={styles.retraitText}>💵 Retrait MoMo</Text>
+          <Text style={styles.retraitText}>Retrait MoMo</Text>
         </TouchableOpacity>
       </View>
 
@@ -97,11 +97,11 @@ export default function DashboardCoursier() {
       <View style={styles.statsBox}>
         <View style={styles.statItem}>
           <Text style={styles.statValue}>{stats.courses}</Text>
-          <Text style={styles.statLabel}>🚚 Courses</Text>
+          <Text style={styles.statLabel}>Courses</Text>
         </View>
         <View style={styles.statItem}>
           <Text style={styles.statValue}>{stats.gains} FCFA</Text>
-          <Text style={styles.statLabel}>💰 Gains</Text>
+          <Text style={styles.statLabel}>Gains</Text>
         </View>
         <View style={styles.statItem}>
           <Text style={styles.statValue}>{stats.note.toFixed(1)}</Text>
@@ -109,7 +109,7 @@ export default function DashboardCoursier() {
         </View>
       </View>
       {/* 🔹 Dernières courses */}
-      <Text style={styles.sectionTitle}>📦 Dernières courses</Text>
+      <Text style={styles.sectionTitle}>Dernières courses</Text>
       <FlatList
         data={courses}
         keyExtractor={(item) => item.id.toString()}
@@ -130,11 +130,11 @@ export default function DashboardCoursier() {
     
     {/* Navigation bas */}
         <View style={styles.navbar}>
-            <TouchableOpacity onPress={() => router.push("/#")}><Text>🏠 Accueil</Text></TouchableOpacity>
-            <TouchableOpacity onPress={() => router.push("/#")}><Text>🗺️ Carte</Text></TouchableOpacity>
-            <TouchableOpacity onPress={() => router.push("/#")}><Text>💰 Gains</Text></TouchableOpacity>
-            <TouchableOpacity onPress={() => router.push("/profil_coursier")}><Text>👤 Profil</Text></TouchableOpacity>
-            <TouchableOpacity onPress={() => router.push("/#")}><Text>🚪 Déconnexion</Text></TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push("/#")}><Text>Accueil</Text></TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push("/UniversalMap")}><Text>Carte</Text></TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push("/Coursier/Mes_gains")}><Text>Gains</Text></TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push("/Coursier/profil_coursier")}><Text>Profil</Text></TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push("/#")}><Text>Déconnexion</Text></TouchableOpacity>
         </View>
     </>
 
@@ -169,5 +169,5 @@ const styles = StyleSheet.create({
   courseItem: { flexDirection: 'row', marginBottom: 12, alignItems: 'center' },
   courseImage: { width: 50, height: 50, marginRight: 10, borderRadius: 8 },
   gain: { color: '#27AE60', fontWeight: 'bold' },
-  navbar: { flexDirection: 'row', justifyContent: 'space-around', padding: 12, borderTopWidth: 1, borderColor: '#ccc' }
+   navbar: { flexDirection: "row", justifyContent: "space-around", marginTop: 20, backgroundColor: "#fcfcfd", borderRadius: 10, alignItems: "center", paddingBottom: 50, },
 });

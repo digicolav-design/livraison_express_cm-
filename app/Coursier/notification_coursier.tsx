@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -13,12 +13,10 @@ import {
   Platform,
 } from 'react-native';
 
-import UniversalMap from "./UniversalMap"; // ✅ Composant universel (Web + Mobile)
-import { useLocalSearchParams, useRouter, } from "expo-router"; // ✅ Récupère l’ID passé en paramètre
-import { Float } from 'react-native/Libraries/Types/CodegenTypes';
+import UniversalMap from "../UniversalMap"; 
+import { useLocalSearchParams, useRouter } from "expo-router";
 
-const { height } = Dimensions.get('window');
-const router = useRouter(); //  initialise le router
+const { height, width } = Dimensions.get('window');
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface CourseData {
@@ -28,9 +26,8 @@ interface CourseData {
   durationMinutes: number;
   prixFCFA: number;
   gainFCFA: number;
-  pickup_address: { label:string; latitude: Float; longitude: Float; photoUrl: string | null };
-  delivery_address: { label:string; latitude: Float; longitude: Float; photoUrl: string | null };
-
+  pickup_address: { label:string; latitude: number; longitude: number; photoUrl: string | null };
+  delivery_address: { label:string; latitude: number; longitude: number; photoUrl: string | null };
   colis: { description: string; photoUrl: string | null };
 }
 
@@ -50,14 +47,14 @@ const BlinkingDot: React.FC<{ color: string }> = ({ color }) => {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function NotificationCoursier() {
-  // Récupération de l’ID depuis l’URL
   const { id } = useLocalSearchParams<{ id?: string }>();
+  const router = useRouter();
 
   if (!id) {
     return <Text>Erreur: aucun ID fourni</Text>;
   }
 
-  //  Mock de données (à remplacer par API ou store global)
+  // Mock de données
   const courseData: CourseData = {
     id,
     isExpress: true,
@@ -66,16 +63,12 @@ export default function NotificationCoursier() {
     prixFCFA: 1760,
     gainFCFA: 1408,
     pickup_address: { label: "Rue Melen, Yaoundé", latitude: 3.8667, longitude: 11.5167, photoUrl: null },
-    delivery_address: { label: "Bastos, Yaoundé", latitude: 3.8667, longitude: 11.5167, photoUrl: null },
-
+    delivery_address: { label: "Bastos, Yaoundé", latitude: 3.8800, longitude: 11.5050, photoUrl: null },
     colis: { description: "Documents administratifs — fragile", photoUrl: null },
   };
 
-  //  Countdown
-
-
   const [secondsLeft, setSecondsLeft] = useState(60);
-  const [expired, setExpired]         = useState(false);
+  const [expired, setExpired] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // ✅ Animation cloche 🔔
@@ -110,42 +103,34 @@ export default function NotificationCoursier() {
 
   // ✅ Expiration
   useEffect(() => {
-  if (expired) {
-    showAlert(
-      "Temps de réponse épuisé",
-      "Vous ne pouvez plus accepter cette demande.",
-      () => {
-        // ✅ Redirection automatique après expiration
-        router.push("/profil_coursier");
-      }
-    );
-  }
-}, [expired]);
-
+    if (expired) {
+      showAlert(
+        "Temps de réponse épuisé",
+        "Vous ne pouvez plus accepter cette demande.",
+        () => router.push("/Coursier/profil_coursier")
+      );
+    }
+  }, [expired]);
 
   const showAlert = (title: string, message: string, onConfirm?: () => void) => {
-  if (Platform.OS === "web") {
-    window.alert(`${title}\n${message}`);
-    if (onConfirm) onConfirm();
-  } else {
-    Alert.alert(title, message, [{ text: "OK", onPress: onConfirm }]);
-  }
-};
-
-
+    if (Platform.OS === "web") {
+      window.alert(`${title}\n${message}`);
+      if (onConfirm) onConfirm();
+    } else {
+      Alert.alert(title, message, [{ text: "OK", onPress: onConfirm }]);
+    }
+  };
 
   // ✅ Actions
- const handleAccept = () => {
-  clearInterval(timerRef.current!);
-  showAlert("Course acceptée", `ID: ${courseData.id}`, () => router.push("/navigation_coursier"));
-};
+  const handleAccept = () => {
+    clearInterval(timerRef.current!);
+    showAlert("Course acceptée", `ID: ${courseData.id}`, () => router.push("/Coursier/navigation_coursier"));
+  };
 
-const handleRefuse = () => {
-  clearInterval(timerRef.current!);
-  showAlert("Course refusée", "Vous avez refusé la course.", () => router.push("/profil_coursier"));
-};
-
-
+  const handleRefuse = () => {
+    clearInterval(timerRef.current!);
+    showAlert("Course refusée", "Vous avez refusé la course.", () => router.push("/Coursier/profil_coursier"));
+  };
 
   const formatTime = (s: number) => {
     const mm = String(Math.floor(s / 60)).padStart(2, '0');
@@ -153,37 +138,40 @@ const handleRefuse = () => {
     return `${mm}:${ss}`;
   };
 
+  // ✅ Progress bar animée
+  const progressWidth = (secondsLeft / 60) * (width - 40);
+
   return (
-     <>
-    <ScrollView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+    <>
+      <ScrollView style={styles.container}>
+        <StatusBar barStyle="dark-content" />
 
-      {/* ── Header ── */}
-      <View style={styles.header}>
-        <Animated.Text
-          style={[styles.bellIcon, { transform: [{ rotate: bellShake.interpolate({
-            inputRange: [-8, 8], outputRange: ['-15deg', '15deg'],
-          }) }] }]}
-        >
-          🔔
-        </Animated.Text>
-        <Text style={styles.headerTitle}>NOUVELLE COURSE !</Text>
-        {courseData.isExpress && (
-          <View style={styles.expressBadge}>
-            <Text style={styles.expressText}>⚡ EXPRESS</Text>
-          </View>
-        )}
-      </View>
+        {/* Header */}
+        <View style={styles.header}>
+          <Animated.Text
+            style={[styles.bellIcon, { transform: [{ rotate: bellShake.interpolate({
+              inputRange: [-8, 8], outputRange: ['-15deg', '15deg'],
+            }) }] }]}
+          >
+            🔔
+          </Animated.Text>
+          <Text style={styles.headerTitle}>NOUVELLE COURSE !</Text>
+          {courseData.isExpress && (
+            <View style={styles.expressBadge}>
+              <Text style={styles.expressText}>⚡ EXPRESS</Text>
+            </View>
+          )}
+        </View>
 
-      {/* ── Map universelle ── */}
-      <View style={styles.mapContainer}>
-        <UniversalMap
-          pickup_address={courseData.pickup_address}
-          delivery_address={courseData.delivery_address}
-        />
-      </View>
+        {/* Map universelle */}
+        <View style={styles.mapContainer}>
+          <UniversalMap
+            pickup_address={courseData.pickup_address}
+            delivery_address={courseData.delivery_address}
+          />
+        </View>
 
-      {/* ── Détails de la course ── */}
+       {/* ── Détails de la course ── */}
       <View style={styles.card}>
         <View style={styles.cardheader}>  
           <Text style={styles.cardHeader}>Détails de la course</Text>
@@ -256,20 +244,21 @@ const handleRefuse = () => {
 
         </View>
       </View>
+      </ScrollView>
 
-    </ScrollView>
-
-    
-      {/* ── Countdown ── */}
+      {/* Countdown avec barre */}
       <View style={styles.countdownBar}>
         <Text style={styles.countdownLabel}>⏱ Accepte dans</Text>
         <Text style={styles.countdownValue}>{formatTime(secondsLeft)}</Text>
+      </View>
+      <View style={styles.progressContainer}>
+        <View style={[styles.progressBar, { width: progressWidth }]} />
       </View>
     </>
   );
 }
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
+// ─── Styles  ────────────────────────────────────────────────
 
 const BLUE   = '#4285F4';
 const GREEN  = '#00C853';
@@ -477,4 +466,17 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     color : RED,
   },
-  });
+  progressContainer: {
+    height: 8,
+    backgroundColor: "#F0F0F0",
+    marginHorizontal: 20,
+    marginBottom: 8,
+    borderRadius: 4,
+    overflow: "hidden",
+  },
+  progressBar: {
+    height: 8,
+    backgroundColor: "#FF3B30",
+  },
+
+});

@@ -51,6 +51,12 @@ export default function SplashScreen() {
         >
           <Text style={styles.btnYellowText}>Commencer →</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.btnYellow}
+          onPress={() => router.push('/Coursier/profil_coursier')}
+        >
+          <Text style={styles.btnYellowText}>Commencer →</Text>
+        </TouchableOpacity>
 
 
         <TouchableOpacity

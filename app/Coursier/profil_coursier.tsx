@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Dimensions, Platform } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 
 export default function ProfilCoursier() {
   const router = useRouter();
+
+  const { width} = Dimensions.get("window");
 
   const coursier = {
     nom: "JEAN-BAPTISTE K.",
@@ -79,7 +81,7 @@ export default function ProfilCoursier() {
         <TouchableOpacity style={styles.button}><Text >✏️ Modifier profil</Text></TouchableOpacity>
         <TouchableOpacity style={styles.button}><Text >📞 {coursier.telephone}</Text></TouchableOpacity>
         <TouchableOpacity style={styles.button } onPress={() =>
-            router.push({ pathname: "/notification_coursier", params: { id: "course_001" } })}>
+            router.push({ pathname: "/Coursier/notification_coursier", params: { id: "course_001" } })}>
               <Text >📧 Notifications
               </Text>
         </TouchableOpacity>
@@ -89,7 +91,7 @@ export default function ProfilCoursier() {
       <View style={styles.sectionBox}>
         <Text style={styles.sectionTitle}>❓ Aide</Text>
         <TouchableOpacity style={styles.button}><Text >🤖 Support LEC</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => router.push("/#")}>
+        <TouchableOpacity style={styles.button} onPress={() => router.push("/Coursier/Mes_gains")}>
           <Text>📊 Mes statistiques</Text>
         </TouchableOpacity>
       </View>
@@ -100,17 +102,18 @@ export default function ProfilCoursier() {
     
        {/* Navigation bas */}
     <View style={styles.navBar}>
-      <TouchableOpacity onPress={() => router.push("/dashboard_coursier")}><Text>🏠 Accueil</Text></TouchableOpacity>
-      <TouchableOpacity onPress={() => router.push("/#")}><Text>🗺️ Carte</Text></TouchableOpacity>
-      <TouchableOpacity onPress={() => router.push("/#")}><Text>💰 Gains</Text></TouchableOpacity>
-      <TouchableOpacity><Text>👤 Profil</Text></TouchableOpacity>
-      <TouchableOpacity onPress={() => router.push("/#")}><Text>🚪 Déconnexion</Text></TouchableOpacity>
+      <TouchableOpacity onPress={() => router.push("/Coursier/dashboard_coursier")}><Text>Accueil</Text></TouchableOpacity>
+      <TouchableOpacity onPress={() => router.push("/UniversalMap")}><Text>Carte</Text></TouchableOpacity>
+      <TouchableOpacity onPress={() => router.push("/Coursier/Mes_gains")}><Text>Gains</Text></TouchableOpacity>
+      <TouchableOpacity onPress={() => router.push("/Coursier/profil_coursier")}><Text>Profil</Text></TouchableOpacity>
+      <TouchableOpacity onPress={() => router.push("/#")}><Text>Déconnexion</Text></TouchableOpacity>
     </View>
     </>
 
   );
 }
 
+const { width} = Dimensions.get("window");
 const styles = StyleSheet.create({
   container: { padding: 20, backgroundColor: "#fcfcfd" },
   header: { alignItems: "center", marginBottom: 20, backgroundColor: "#141428" },
@@ -122,16 +125,26 @@ const styles = StyleSheet.create({
   statsBox: {
     flexDirection: "row",
     justifyContent: "space-around",
-  
-    padding: 10,
+    flexWrap: "wrap", //  permet d’aller à la ligne sur petits écrans
+    padding: width < 400 ? 8 : 12, //  padding réduit sur petits écrans
     borderRadius: 10,
     marginTop: 10,
     width: "100%",
-   
   },
 
-  statsItem: { color: "#faf9f9", fontWeight: "800",  fontSize: 20, borderWidth:1, borderColor: "#edd8a4", borderRadius: 20, padding: 30,paddingBottom: 60, paddingTop:60, backgroundColor: "#2f3036" },
-
+  statsItem: {
+    color: "#faf9f9",
+    fontWeight: "800",
+    fontSize: width < 400 ? 16 : 20, //  taille texte adaptée
+    borderWidth: 1,
+    borderColor: "#edd8a4",
+    borderRadius: 20,
+    padding: width < 400 ? 16 : 30, //  padding réduit sur mobile
+    backgroundColor: "#2f3036",
+    marginBottom: 10,
+    minWidth: Platform.OS === "web" ? width * 0.2 : width * 0.4, //  largeur relative
+    alignItems: "center",
+  },
   sectionBox: {
     backgroundColor: "#f1f5f5",
     padding: 15,
@@ -151,5 +164,5 @@ const styles = StyleSheet.create({
   button: { backgroundColor: "#f1f5f5", padding: 12,  marginVertical: 5,  },
   
   
-  navBar: { flexDirection: "row", justifyContent: "space-around", marginTop: 20, backgroundColor: "#fcfcfd", padding: 10, borderRadius: 10 },
+  navBar: { flexDirection: "row", justifyContent: "space-around", marginTop: 20, backgroundColor: "#fcfcfd", borderRadius: 10, alignItems: "center", paddingBottom: 50, },
 });
