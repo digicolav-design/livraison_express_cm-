@@ -1,22 +1,23 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Animated,
   Alert,
-  ScrollView,
+  Animated,
   Dimensions,
-  StatusBar,
   Image,
   Platform,
-} from 'react-native';
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
-import UniversalMap from "../UniversalMap"; 
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter, } from "expo-router"; // ✅ Récupère l’ID passé en paramètre
+//import { Float } from "react-native/Libraries/Types/CodegenTypes";
+import UniversalMap from "@/components/UniversalMap.native"; // ✅ Composant universel (Web + Mobile)
 
-const { height, width } = Dimensions.get('window');
+const { height } = Dimensions.get("window");
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface CourseData {
@@ -26,8 +27,19 @@ interface CourseData {
   durationMinutes: number;
   prixFCFA: number;
   gainFCFA: number;
-  pickup_address: { label:string; latitude: number; longitude: number; photoUrl: string | null };
-  delivery_address: { label:string; latitude: number; longitude: number; photoUrl: string | null };
+  pickup_address: {
+    label: string;
+    latitude: number;
+    longitude: number;
+    photoUrl: string | null;
+  };
+  delivery_address: {
+    label: string;
+    latitude: number;
+    longitude: number;
+    photoUrl: string | null;
+  };
+
   colis: { description: string; photoUrl: string | null };
 }
 
@@ -37,35 +49,65 @@ const BlinkingDot: React.FC<{ color: string }> = ({ color }) => {
   useEffect(() => {
     Animated.loop(
       Animated.sequence([
-        Animated.timing(opacity, { toValue: 0.1, duration: 600, useNativeDriver: true }),
-        Animated.timing(opacity, { toValue: 1,   duration: 600, useNativeDriver: true }),
-      ])
+        Animated.timing(opacity, {
+          toValue: 0.1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+      ]),
     ).start();
   }, [opacity]);
-  return <Animated.View style={[styles.dot, { backgroundColor: color, opacity }]} />;
+  return (
+    <Animated.View style={[styles.dot, { backgroundColor: color, opacity }]} />
+  );
 };
 
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function NotificationCoursier() {
+  const router = useRouter(); //  initialise le router
+  // Récupération de l’ID depuis l’URL
   const { id } = useLocalSearchParams<{ id?: string }>();
-  const router = useRouter();
 
-  if (!id) {
+
+  const rawId = Array.isArray(id) ? id[0] : id;
+
+  if (!rawId) {
     return <Text>Erreur: aucun ID fourni</Text>;
   }
 
   // Mock de données
   const courseData: CourseData = {
-    id,
+    id: rawId,
     isExpress: true,
     distance: 3.2,
     durationMinutes: 22,
     prixFCFA: 1760,
     gainFCFA: 1408,
-    pickup_address: { label: "Rue Melen, Yaoundé", latitude: 3.8667, longitude: 11.5167, photoUrl: null },
-    delivery_address: { label: "Bastos, Yaoundé", latitude: 3.8800, longitude: 11.5050, photoUrl: null },
-    colis: { description: "Documents administratifs — fragile", photoUrl: null },
+    pickup_address: {
+      label: "Rue Melen, Yaoundé",
+      latitude: 3.8667,
+      longitude: 11.5167,
+      photoUrl: null,
+    },
+    delivery_address: {
+      label: "Bastos, Yaoundé",
+      latitude: 3.8667,
+      longitude: 11.5167,
+      photoUrl: null,
+    },
+
+    colis: {
+      description: "Documents administratifs — fragile",
+      photoUrl: null,
+    },
   };
+
+  //  Countdown
 
   const [secondsLeft, setSecondsLeft] = useState(60);
   const [expired, setExpired] = useState(false);
@@ -76,20 +118,40 @@ export default function NotificationCoursier() {
   useEffect(() => {
     Animated.loop(
       Animated.sequence([
-        Animated.timing(bellShake, { toValue:  8, duration: 100, useNativeDriver: true }),
-        Animated.timing(bellShake, { toValue: -8, duration: 100, useNativeDriver: true }),
-        Animated.timing(bellShake, { toValue:  5, duration: 80,  useNativeDriver: true }),
-        Animated.timing(bellShake, { toValue: -5, duration: 80,  useNativeDriver: true }),
-        Animated.timing(bellShake, { toValue:  0, duration: 80,  useNativeDriver: true }),
+        Animated.timing(bellShake, {
+          toValue: 8,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+        Animated.timing(bellShake, {
+          toValue: -8,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+        Animated.timing(bellShake, {
+          toValue: 5,
+          duration: 80,
+          useNativeDriver: true,
+        }),
+        Animated.timing(bellShake, {
+          toValue: -5,
+          duration: 80,
+          useNativeDriver: true,
+        }),
+        Animated.timing(bellShake, {
+          toValue: 0,
+          duration: 80,
+          useNativeDriver: true,
+        }),
         Animated.delay(2000),
-      ])
+      ]),
     ).start();
   }, [bellShake]);
 
   // ✅ Timer
   useEffect(() => {
     timerRef.current = setInterval(() => {
-      setSecondsLeft(prev => {
+      setSecondsLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timerRef.current!);
           setExpired(true);
@@ -107,12 +169,19 @@ export default function NotificationCoursier() {
       showAlert(
         "Temps de réponse épuisé",
         "Vous ne pouvez plus accepter cette demande.",
-        () => router.push("/Coursier/profil_coursier")
+        () => {
+          // ✅ Redirection automatique après expiration
+          router.push("/Coursier/profil_coursier");
+        },
       );
     }
   }, [expired]);
 
-  const showAlert = (title: string, message: string, onConfirm?: () => void) => {
+  const showAlert = (
+    title: string,
+    message: string,
+    onConfirm?: () => void,
+  ) => {
     if (Platform.OS === "web") {
       window.alert(`${title}\n${message}`);
       if (onConfirm) onConfirm();
@@ -124,34 +193,47 @@ export default function NotificationCoursier() {
   // ✅ Actions
   const handleAccept = () => {
     clearInterval(timerRef.current!);
-    showAlert("Course acceptée", `ID: ${courseData.id}`, () => router.push("/Coursier/navigation_coursier"));
+    showAlert("Course acceptée", `ID: ${courseData.id}`, () =>
+      router.push("/Coursier/navigation_coursier"),
+    );
   };
 
   const handleRefuse = () => {
     clearInterval(timerRef.current!);
-    showAlert("Course refusée", "Vous avez refusé la course.", () => router.push("/Coursier/profil_coursier"));
+    showAlert("Course refusée", "Vous avez refusé la course.", () =>
+      router.push("/Coursier/profil_coursier"),
+    );
   };
 
   const formatTime = (s: number) => {
-    const mm = String(Math.floor(s / 60)).padStart(2, '0');
-    const ss = String(s % 60).padStart(2, '0');
+    const mm = String(Math.floor(s / 60)).padStart(2, "0");
+    const ss = String(s % 60).padStart(2, "0");
     return `${mm}:${ss}`;
   };
 
-  // ✅ Progress bar animée
-  const progressWidth = (secondsLeft / 60) * (width - 40);
+  
 
   return (
     <>
       <ScrollView style={styles.container}>
         <StatusBar barStyle="dark-content" />
 
-        {/* Header */}
+        {/* ── Header ── */}
         <View style={styles.header}>
           <Animated.Text
-            style={[styles.bellIcon, { transform: [{ rotate: bellShake.interpolate({
-              inputRange: [-8, 8], outputRange: ['-15deg', '15deg'],
-            }) }] }]}
+            style={[
+              styles.bellIcon,
+              {
+                transform: [
+                  {
+                    rotate: bellShake.interpolate({
+                      inputRange: [-8, 8],
+                      outputRange: ["-15deg", "15deg"],
+                    }),
+                  },
+                ],
+              },
+            ]}
           >
             🔔
           </Animated.Text>
@@ -163,7 +245,7 @@ export default function NotificationCoursier() {
           )}
         </View>
 
-        {/* Map universelle */}
+        {/* ── Map universelle ── */}
         <View style={styles.mapContainer}>
           <UniversalMap
             pickup_address={courseData.pickup_address}
@@ -171,43 +253,54 @@ export default function NotificationCoursier() {
           />
         </View>
 
-       {/* ── Détails de la course ── */}
-      <View style={styles.card}>
-        <View style={styles.cardheader}>  
-          <Text style={styles.cardHeader}>Détails de la course</Text>
-          <Text style={styles.distanceText}>{courseData.distance.toFixed(1)} km</Text>
+        {/* ── Détails de la course ── */}
+        <View style={styles.card}>
+          <View style={styles.cardheader}>
+            <Text style={styles.cardHeader}>Détails de la course</Text>
+            <Text style={styles.distanceText}>
+              {courseData.distance.toFixed(1)} km
+            </Text>
+          </View>
+          {/* Adresses */}
+          <View style={styles.addressRow}>
+            <BlinkingDot color="#00C853" />
+            <Text style={styles.addressText}>
+              {courseData.pickup_address.label}
+            </Text>
+          </View>
+          <View style={styles.addressRow}>
+            <BlinkingDot color="#FF3B30" />
+            <Text style={styles.addressText}>
+              {courseData.delivery_address.label}
+            </Text>
+          </View>
 
-        </View>
-        {/* Adresses */}
-        <View style={styles.addressRow}>
-          <BlinkingDot color="#00C853" />
-          <Text style={styles.addressText}>{courseData.pickup_address.label}</Text>
-        </View>
-        <View style={styles.addressRow}>
-          <BlinkingDot color="#FF3B30" />
-          <Text style={styles.addressText}>{courseData.delivery_address.label}</Text>
-        </View>
-
-        {/* Stats */}
-        <View style={styles.statsRow}>
+          {/* Stats */}
+          <View style={styles.statsRow}>
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>{courseData.prixFCFA.toLocaleString('fr-FR')}</Text>
+              <Text style={styles.statValue}>
+                {courseData.prixFCFA.toLocaleString("fr-FR")}
+              </Text>
               <Text style={styles.statLabel}>FCFA prix</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
-              <Text style={[styles.statValue, styles.gainValue]}>{courseData.gainFCFA.toLocaleString('fr-FR')}</Text>
+              <Text style={[styles.statValue, styles.gainValue]}>
+                {courseData.gainFCFA.toLocaleString("fr-FR")}
+              </Text>
               <Text style={styles.statLabel}>FCFA gain</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>{courseData.durationMinutes}min</Text>
+              <Text style={styles.statValue}>
+                {courseData.durationMinutes}min
+              </Text>
               <Text style={styles.statLabel}>estimé</Text>
             </View>
           </View>
 
-        {/* Colis */}
-         <View style={styles.colisRow}>
+          {/* Colis */}
+          <View style={styles.colisRow}>
             {courseData.colis.photoUrl ? (
               <Image
                 source={{ uri: courseData.colis.photoUrl }}
@@ -224,86 +317,104 @@ export default function NotificationCoursier() {
             </Text>
           </View>
 
-        {/* Boutons */}
-        <View style={styles.actionsRow}>
-          <TouchableOpacity
-             style={[styles.btnRefuse, expired && { opacity: 0.5 }]}
-             onPress={handleRefuse}
+          {/* Boutons */}
+          <View style={styles.actionsRow}>
+            <TouchableOpacity
+              style={[styles.btnRefuse, expired && { opacity: 0.5 }]}
+              onPress={handleRefuse}
               disabled={expired} // ✅ désactive si expiré
-          >
-             <Text style={styles.btnRefuseText}>✕ Refuser</Text>
-          </TouchableOpacity>
+            >
+              <Text style={styles.btnRefuseText}>✕ Refuser</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-             style={[styles.btnAccept, expired && { opacity: 0.5 }]}
+            <TouchableOpacity
+              style={[styles.btnAccept, expired && { opacity: 0.5 }]}
               onPress={handleAccept}
-             disabled={expired} // ✅ désactive si expiré
-          >
+              disabled={expired} // ✅ désactive si expiré
+            >
               <Text style={styles.btnAcceptText}>✓ Accepter</Text>
-          </TouchableOpacity>
-
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
       </ScrollView>
 
-      {/* Countdown avec barre */}
+      {/* ── Countdown ── */}
       <View style={styles.countdownBar}>
         <Text style={styles.countdownLabel}>⏱ Accepte dans</Text>
         <Text style={styles.countdownValue}>{formatTime(secondsLeft)}</Text>
       </View>
-      <View style={styles.progressContainer}>
-        <View style={[styles.progressBar, { width: progressWidth }]} />
-      </View>
+      
     </>
   );
 }
 
 // ─── Styles  ────────────────────────────────────────────────
 
-const BLUE   = '#4285F4';
-const GREEN  = '#00C853';
-const RED    = '#FF3B30';
-const DARK   = '#1A1A2E';
-const CARD_BG = '#FFFFFF';
+const BLUE = "#4285F4";
+const GREEN = "#00C853";
+const RED = "#FF3B30";
+const DARK = "#1A1A2E";
+const CARD_BG = "#FFFFFF";
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#E8EEF7' },
-  header: { flexDirection: 'row', alignItems: 'center', padding: 16, backgroundColor: '#fff' },
-  bellIcon: { fontSize: 22 },
-  headerTitle: { flex: 1, fontSize: 17, fontWeight: '800' },
-  expressBadge: { backgroundColor: '#FFC107', borderRadius: 6, paddingHorizontal: 10 },
-  expressText: { fontSize: 12, fontWeight: '700' },
-  mapContainer: { height: height * 0.35, margin: 16, borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#ccc' },
-  card: { backgroundColor: '#fff', marginHorizontal: 16, borderRadius: 15, elevation: 3, borderColor:BLUE, borderWidth: 2 },
-  cardheader:{ 
-    justifyContent: 'space-between',
-    textAlignVertical:'auto',
-    backgroundColor:BLUE,
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 40,
-   
+  container: { flex: 1, backgroundColor: "#E8EEF7" },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    backgroundColor: "#fff",
   },
- 
+  bellIcon: { fontSize: 22 },
+  headerTitle: { flex: 1, fontSize: 17, fontWeight: "800" },
+  expressBadge: {
+    backgroundColor: "#FFC107",
+    borderRadius: 6,
+    paddingHorizontal: 10,
+  },
+  expressText: { fontSize: 12, fontWeight: "700" },
+  mapContainer: {
+    height: height * 0.35,
+    margin: 16,
+    borderRadius: 12,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#ccc",
+  },
+  card: {
+    backgroundColor: "#fff",
+    marginHorizontal: 16,
+    borderRadius: 15,
+    elevation: 3,
+    borderColor: BLUE,
+    borderWidth: 2,
+  },
+  cardheader: {
+    justifyContent: "space-between",
+    textAlignVertical: "auto",
+    backgroundColor: BLUE,
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 40,
+  },
+
   cardHeader: {
     fontSize: 13,
 
-    fontWeight: '700',
-    color: '#f8f4f4',
-    textTransform: 'uppercase',
+    fontWeight: "700",
+    color: "#f8f4f4",
+    textTransform: "uppercase",
     letterSpacing: 0.8,
-    
   },
   distanceText: {
     fontSize: 14,
-    fontWeight: '800',
-    color: '#e2d8d8',
+    fontWeight: "800",
+    color: "#e2d8d8",
   },
 
   // Addresses
   addressRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 10,
     paddingVertical: 6,
     marginLeft: 20,
@@ -312,25 +423,24 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    
   },
   addressText: {
     flex: 1,
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     color: DARK,
   },
   addressDivider: {
     height: 1,
-    backgroundColor: '#F0F0F0',
+    backgroundColor: "#F0F0F0",
     marginLeft: 22,
   },
 
   // Stats
   statsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F7F9FF',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F7F9FF",
     borderRadius: 12,
     paddingVertical: 12,
     marginVertical: 14,
@@ -338,16 +448,16 @@ const styles = StyleSheet.create({
   },
   statItem: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
   statDivider: {
     width: 1,
     height: 32,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: "#E0E0E0",
   },
   statValue: {
     fontSize: 16,
-    fontWeight: '800',
+    fontWeight: "800",
     color: DARK,
     letterSpacing: 0.3,
   },
@@ -356,21 +466,21 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 11,
-    color: '#888',
+    color: "#888",
     marginTop: 2,
-    fontWeight: '500',
+    fontWeight: "500",
   },
 
   // Colis
   colisRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 12,
-    backgroundColor: '#FFFBF0',
+    backgroundColor: "#FFFBF0",
     borderRadius: 10,
     padding: 10,
     borderLeftWidth: 3,
-    borderLeftColor: '#FFC107',
+    borderLeftColor: "#FFC107",
     marginBottom: 16,
     marginLeft: 20,
   },
@@ -378,15 +488,15 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 8,
-    backgroundColor: '#EEE',
+    backgroundColor: "#EEE",
   },
   colisPhotoPlaceholder: {
     width: 52,
     height: 52,
     borderRadius: 8,
-    backgroundColor: '#FFF0CC',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#FFF0CC",
+    alignItems: "center",
+    justifyContent: "center",
   },
   colisPhotoIcon: {
     fontSize: 26,
@@ -394,14 +504,14 @@ const styles = StyleSheet.create({
   colisDesc: {
     flex: 1,
     fontSize: 13,
-    color: '#444',
-    fontWeight: '500',
+    color: "#444",
+    fontWeight: "500",
     lineHeight: 19,
   },
 
   // Buttons
   actionsRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
     paddingVertical: 14,
     marginLeft: 20,
@@ -413,14 +523,14 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 2,
     borderColor: RED,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFF5F5',
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#FFF5F5",
   },
   btnRefuseText: {
     color: RED,
     fontSize: 15,
-    fontWeight: '700',
+    fontWeight: "700",
     letterSpacing: 0.3,
   },
   btnAccept: {
@@ -428,8 +538,8 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 12,
     backgroundColor: BLUE,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     elevation: 4,
     shadowColor: BLUE,
     shadowOffset: { width: 0, height: 4 },
@@ -437,18 +547,18 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
   },
   btnAcceptText: {
-    color: '#FFF',
+    color: "#FFF",
     fontSize: 15,
-    fontWeight: '800',
+    fontWeight: "800",
     letterSpacing: 0.5,
   },
 
   // Countdown
   countdownBar: {
-    marginTop:2,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    marginTop: 2,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     backgroundColor: CARD_BG,
     paddingHorizontal: 20,
     paddingVertical: 10,
@@ -458,25 +568,12 @@ const styles = StyleSheet.create({
   countdownLabel: {
     fontSize: 13,
     color: RED,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   countdownValue: {
     fontSize: 22,
-    fontWeight: '900',
+    fontWeight: "900",
     letterSpacing: 1,
-    color : RED,
+    color: RED,
   },
-  progressContainer: {
-    height: 8,
-    backgroundColor: "#F0F0F0",
-    marginHorizontal: 20,
-    marginBottom: 8,
-    borderRadius: 4,
-    overflow: "hidden",
-  },
-  progressBar: {
-    height: 8,
-    backgroundColor: "#FF3B30",
-  },
-
 });

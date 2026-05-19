@@ -1,6 +1,6 @@
 import { decode } from "base64-arraybuffer";
 import * as DocumentPicker from "expo-document-picker";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -12,8 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { supabase } from "../../lib/supabase";
-
+import { supabase } from "@/lib/supabase";
 
 {
   /*definition type document*/
@@ -74,7 +73,7 @@ export default function CourierRegistration() {
       console.log("UPLOAD URI:", fileUri);
 
       const fileBase64 = await FileSystem.readAsStringAsync(fileUri, {
-        encoding:"base64",
+        encoding: FileSystem.EncodingType.Base64,
       });
       //const response = await fetch(file.uri); // il lit le  pdf telecharge
       //const blob = await response.blob(); //transforme le fichier en format uploadable
@@ -171,7 +170,12 @@ export default function CourierRegistration() {
       }
 
       console.log("Utilisateur connecté :", user.id);
-      router.push("/Coursier/validation_coursier");
+      router.push({
+        pathname: "/Coursier/validation_coursier",
+        params: {
+          submissionDate: new Date().toISOString(),
+        },
+      });
     } catch (error) {
       console.log(error);
 
@@ -309,7 +313,8 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
 
-  uploadButton: { 
+  uploadButton: {
+    width: "40%", // deux boutons par ligne
     marginTop: 10,
     padding: 15,
     backgroundColor: "#212122",

@@ -1,31 +1,30 @@
-import React, { useEffect, useState, useRef } from "react";
+import UniversalMap from "@/components/UniversalMap.native";
+import { supabase } from "@/lib/supabase";
+import * as Location from "expo-location";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
   Animated,
   Image,
   Linking,
-  Alert,
   Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import * as Location from "expo-location";
-import UniversalMap from "../UniversalMap"; 
-import { useLocalSearchParams, useRouter } from "expo-router";
 export default function NavigationGPSCoursier() {
   const { courseId } = useLocalSearchParams<{ courseId?: string }>();
   const router = useRouter();
 
   //  Données mock (à remplacer par API / DB)
-  const courseData = {
-    id: courseId || "course_001",
-    pickup_address: { label: "Rue Melen, Yaoundé", latitude: 3.8634, longitude: 11.5167 },
-    delivery_address: { label: "Bastos, Yaoundé", latitude: 3.8800, longitude: 11.5050 },
-    client: { name: "Paul Mbarga", phone: "+237690000000", photoUrl: null },
-  };
 
-  // États dynamiques
+  //  États dynamiques
+  const [loading, setLoading] = useState(true);
+  const [delivery, setDelivery] = useState<any>(null);
+  const [client, setClient] = useState<any>(null);
   const [distance, setDistance] = useState<number>(0);
   const [durationMinutes, setDurationMinutes] = useState<number>(0);
   const [estimatedArrival, setEstimatedArrival] = useState<string>("");
@@ -35,14 +34,26 @@ export default function NavigationGPSCoursier() {
   useEffect(() => {
     Animated.loop(
       Animated.sequence([
-        Animated.timing(opacity, { toValue: 0.1, duration: 600, useNativeDriver: true }),
-        Animated.timing(opacity, { toValue: 1, duration: 600, useNativeDriver: true }),
-      ])
+        Animated.timing(opacity, {
+          toValue: 0.1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+      ]),
     ).start();
-  }, [opacity]);
+  }, []);
 
-  // Fonction utilitaire Alert (fallback Web)
-  const showAlert = (title: string, message: string, onConfirm?: () => void) => {
+  // Fonction utilitaire Alert (fallback Web)pour web et mobile
+  const showAlert = (
+    title: string,
+    message: string,
+    onConfirm?: () => void,
+  ) => {
     if (Platform.OS === "web") {
       window.alert(`${title}\n${message}`);
       if (onConfirm) onConfirm();
@@ -51,53 +62,136 @@ export default function NavigationGPSCoursier() {
     }
   };
 
-  // Calcul distance & durée en temps réel
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        showAlert("Permission refusée", "Impossible d'accéder à la localisation.");
+  // CHARGER COURSE
+
+  const chargerCourse = async () => {
+    try {
+      if (!courseId) return;
+
+      const { data, error } = await supabase
+        .from("deliveries")
+        .select("*")
+        .eq("id", courseId)
+        .single();
+
+      if (error || !data) {
+        console.log(error);
         return;
       }
 
-      const position = await Location.getCurrentPositionAsync({});
-      const { latitude, longitude } = position.coords;
+      setDelivery(data);
+      // charger client
+      const { data: clientData } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", data.user_id)
+        .single();
 
-      // Haversine
-      const R = 6371;
-      const dLat = (courseData.pickup_address.latitude - latitude) * Math.PI / 180;
-      const dLng = (courseData.pickup_address.longitude - longitude) * Math.PI / 180;
+      setClient(clientData);
+      await calculDistance(data);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const calculDistance = async (deliveryData: any) => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+
+      if (status !== "granted") {
+        showAlert(
+          "Permission refusée",
+          "Impossible d'accéder à votre position.",
+        );
+        return;
+      }
+      const position = await Location.getCurrentPositionAsync({});
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+      const pickupLat = deliveryData.pickup_latitude;
+      const pickupLng = deliveryData.pickup_longitude;
+      const R = 6371; // Rayon de la Terre en km
+      const dLat = ((pickupLat - latitude) * Math.PI) / 180;
+      const dLng = ((pickupLng - longitude) * Math.PI) / 180;
       const a =
         Math.sin(dLat / 2) ** 2 +
-        Math.cos(latitude * Math.PI / 180) *
-          Math.cos(courseData.pickup_address.latitude * Math.PI / 180) *
+        Math.cos((latitude * Math.PI) / 180) *
+          Math.cos((pickupLat * Math.PI) / 180) *
           Math.sin(dLng / 2) ** 2;
+
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       const dist = R * c;
 
       setDistance(Number(dist.toFixed(1)));
 
-      const minutes = Math.round((dist / 12) * 60); // vitesse moyenne moto
+      const minutes = Math.round((dist / 12) * 60);
+
       setDurationMinutes(minutes);
 
       const now = new Date();
-      now.setMinutes(now.getMinutes() + minutes);
-      setEstimatedArrival(`${now.getHours()}h${String(now.getMinutes()).padStart(2, "0")}`);
-    })();
-  }, []);
 
-  // Action "J’ai récupéré le colis"
-  const handlePickup = () => {
-    showAlert(
-      "Confirmation",
-      "Cliquez sur OK pour confirmer la récupération de votre colis",
-      () => {
-        showAlert("Notification envoyée", "🚚 En route pour votre livraison", () => {
-          router.push("/Coursier/confirmation_livraison_coursier");
-        });
-      }
-    );
+      now.setMinutes(now.getMinutes() + minutes);
+
+      setEstimatedArrival(
+        `${now.getHours()}h${String(now.getMinutes()).padStart(2, "0")}`,
+      );
+    } catch (err) {
+      console.log(err);
+    }
   };
+
+  // ✅ Action "J’ai récupéré le colis"
+  const handlePickup = async () => {
+    try {
+      await supabase
+        .from("deliveries")
+        .update({
+          status: "picked",
+        })
+        .eq("id", courseId);
+
+      showAlert("Colis récupéré", "Le client a été notifié.");
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  // LIVRAISON TERMINÉE
+  const handleDelivered = async () => {
+    try {
+      await supabase
+        .from("deliveries")
+        .update({
+          status: "delivered",
+        })
+        .eq("id", courseId);
+
+      showAlert("Livraison terminée", "Mission terminée avec succès.", () => {
+        router.replace("/Coursier/dashboard_coursier");
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    chargerCourse();
+  }, []);
+  //Loader
+  if (loading) {
+    return (
+      <View style={styles.loader}>
+        <ActivityIndicator size="large" color="#4285F4" />
+      </View>
+    );
+  }
+  if (!delivery) {
+    return (
+      <View style={styles.loader}>
+        <Text>Course introuvable</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -108,19 +202,30 @@ export default function NavigationGPSCoursier() {
         <Text style={styles.distanceText}>{distance} km restants</Text>
       </View>
 
-      {/* ── Carte ── */}
+      {/* ── Carte/Map ── */}
       <View style={styles.mapContainer}>
         <UniversalMap
-          pickup_address={courseData.pickup_address}
-          delivery_address={courseData.delivery_address}
+          pickup_address={{
+            latitude: delivery.pickup_latitude,
+            longitude: delivery.pickup_longitude,
+          }}
+          delivery_address={{
+            latitude: delivery.delivery_latitude,
+            longitude: delivery.delivery_longitude,
+          }}
         />
       </View>
 
       {/* ── Infos temps ── */}
       <View style={styles.infoCard}>
-        <Text style={styles.infoText}>Arrivée estimée : {estimatedArrival}</Text>
+        <Text style={styles.infoText}>
+          Arrivée estimée : {estimatedArrival}
+        </Text>
         <Text style={styles.infoText}>{durationMinutes} MIN</Text>
-        <Text style={styles.infoText}>Destination : {courseData.delivery_address.label}</Text>
+        <Text style={styles.infoText}>
+          Destination : {}
+          {delivery.delivery_address.label}
+        </Text>
       </View>
 
       {/* ── Prochaine direction ── */}
@@ -132,16 +237,20 @@ export default function NavigationGPSCoursier() {
 
       {/* ── Infos client ── */}
       <View style={styles.clientCard}>
-        {courseData.client.photoUrl ? (
-          <Image source={{ uri: courseData.client.photoUrl }} style={styles.clientPhoto} />
+        {client?.photoUrl ? (
+          <Image source={{ uri: client.photoUrl }} style={styles.clientPhoto} />
         ) : (
           <Text style={styles.clientPhoto}>👤</Text>
         )}
         <View style={{ flex: 1 }}>
-          <Text style={styles.clientName}>{courseData.client.name} (Client)</Text>
-          <Text style={styles.clientAddress}>{courseData.pickup_address.label}</Text>
+          <Text style={styles.clientName}>{client?.full_name} (Client)</Text>
+          <Text style={styles.clientAddress}>
+            {delivery.pickup_address.label}
+          </Text>
         </View>
-        <TouchableOpacity onPress={() => Linking.openURL(`sms:${courseData.client.phone}`)}>
+        <TouchableOpacity
+          onPress={() => Linking.openURL(`sms:${client?.phone}`)}
+        >
           <Text style={styles.msgButton}>📩</Text>
         </TouchableOpacity>
       </View>
@@ -150,6 +259,9 @@ export default function NavigationGPSCoursier() {
       <TouchableOpacity style={styles.btnPickup} onPress={handlePickup}>
         <Text style={styles.btnPickupText}>✅ J’ai récupéré le colis</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={styles.btnDelivered} onPress={handleDelivered}>
+        <Text style={styles.btnPickupText}>📦 Livraison terminée</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -157,14 +269,36 @@ export default function NavigationGPSCoursier() {
 // ─── Styles ────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#E8EEF7", padding: 16 },
+  loader: { flex: 1, justifyContent: "center", alignItems: "center" },
   header: { flexDirection: "row", alignItems: "center", marginBottom: 12 },
-  dot: { width: 12, height: 12, borderRadius: 6, backgroundColor: "#00C853", marginRight: 8 },
+  dot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: "#00C853",
+    marginRight: 8,
+  },
   headerText: { fontSize: 16, fontWeight: "700", flex: 1 },
   distanceText: { fontSize: 14, color: "#4285F4", fontWeight: "600" },
-  mapContainer: { height: 250, borderRadius: 12, overflow: "hidden", marginBottom: 16 },
-  infoCard: { backgroundColor: "#fff", borderRadius: 12, padding: 12, marginBottom: 12 },
+  mapContainer: {
+    height: 250,
+    borderRadius: 12,
+    overflow: "hidden",
+    marginBottom: 16,
+  },
+  infoCard: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
+  },
   infoText: { fontSize: 14, fontWeight: "600", marginBottom: 4 },
-  directionCard: { backgroundColor: "#FFFBF0", borderRadius: 12, padding: 12, marginBottom: 12 },
+  directionCard: {
+    backgroundColor: "#FFFBF0",
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
+  },
   directionText: { fontSize: 14, fontWeight: "700", color: "#FF3B30" },
   clientCard: {
     flexDirection: "row",
@@ -178,6 +312,17 @@ const styles = StyleSheet.create({
   clientName: { fontSize: 15, fontWeight: "700" },
   clientAddress: { fontSize: 13, color: "#555" },
   msgButton: { fontSize: 24, marginLeft: 8 },
-  btnPickup: { backgroundColor: "#00C853", borderRadius: 12, alignItems: "center" , marginBottom:100},
-  btnPickupText: { color: "#fff", fontSize: 16, fontWeight: "800", paddingBottom:160 },
+  btnPickup: {
+    backgroundColor: "#00C853",
+    borderRadius: 12,
+    padding: 14,
+    alignItems: "center",
+  },
+  btnDelivered: {
+    backgroundColor: "#4285F4",
+    borderRadius: 12,
+    padding: 14,
+    alignItems: "center",
+  },
+  btnPickupText: { color: "#fff", fontSize: 16, fontWeight: "800" },
 });
